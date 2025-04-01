@@ -5,8 +5,9 @@
 }
 
 :root {
-  --white: #ffffffff;
-  --wheat: #ffe6c0ff;
-  --orange-light: #ffb340ff;
-  --orange: #ff9800;
+  --background: #ffffffff;
+  --secondary: #ffe6c0ff;
+  --primary-light: #ffb340ff;
+  --primary: #ff9800;
+  --text: #333333;
 }
