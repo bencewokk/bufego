@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import './App.css'
-import axios from 'axios';
+import "./App.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { MainPage } from "./pages/_main";
 
 function App() {
-  const [message, setMessage] = useState('');
-  axios.get('http://localhost:3000/').then((res) => {setMessage(res.data)})
   return (
     <>
-      <div>teszt</div>
-      <div>Backend teszt: {message}</div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+        </Routes>
+      </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
