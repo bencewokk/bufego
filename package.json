@@ -11,6 +11,6 @@
     "concurrently": "^9.1.2"
   },
   "scripts": {
-    "dev": "concurrently \"cd backend && npm start\" \"cd frontend && npm run dev\""
+    "dev": "concurrently \"cd backend && nodemon server.js\" \"cd frontend && npm run dev\""
   }
 }
