@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv';
+import { connect } from './database/connect.js';
 dotenv.config();
 
 const app = express();
@@ -15,4 +16,5 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`A szerver fut a ${PORT} porton`)
+    connect();
 })
