@@ -1,26 +1,39 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+
 export const Navbar = () => {
   return (
     <nav className="w-full bg-[var(--background)] shadow-lg">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center py-4">
-          <div className="text-2xl md:text-3xl font-bold mb-4 md:mb-0 text-[var(--primary)]">
+        <div className="flex justify-between items-center py-4">
+          <div className="text-2xl md:text-3xl font-bold text-[var(--primary)]">
             BüféGO
           </div>
 
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+          <div className="flex items-center gap-4 md:gap-8">
             <a
               href="/login"
-              className="text-[var(--text)] transition-colors text-lg"
+              className="text-[var(--text)] transition-colors text-lg flex items-center gap-2"
+              aria-label="Bejelentkezés"
             >
-              Bejelentkezés
+              <FontAwesomeIcon 
+                icon={faUser} 
+                className="md:hidden text-xl" 
+              />
+              <span className="hidden md:inline">Bejelentkezés</span>
             </a>
             <a
               href="/register"
-              className="bg-[var(--primary)] text-[var(--background)] px-6 py-2 rounded-full 
-                           hover:bg-[var(--primary-light)] transition-colors text-lg text-center
-                           w-full md:w-auto"
+              className="bg-[var(--primary)] text-[var(--background)] px-4 py-2 rounded-full 
+                           hover:bg-[var(--primary-light)] transition-colors text-lg
+                           flex items-center justify-center gap-2"
+              aria-label="Regisztráció"
             >
-              Regisztráció
+              <FontAwesomeIcon 
+                icon={faUserPlus} 
+                className="md:hidden" 
+              />
+              <span className="hidden md:inline">Regisztráció</span>
             </a>
           </div>
         </div>
