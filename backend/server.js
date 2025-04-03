@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv';
 import { connect } from './database/connect.js';
 import authRoutes from './routes/auth.routes.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
 dotenv.config();
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.listen(PORT, () => {
     console.log(`A szerver fut a ${PORT} porton`)

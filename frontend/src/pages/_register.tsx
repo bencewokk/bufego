@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { FloatingBlob } from "../components/design/Blob";
+import logoImage from '../assets/bufego.png';
 
 export const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -32,7 +34,10 @@ export const RegisterPage = () => {
 
     toast.promise(axios.post(url, payload), {
       loading: "Regisztrálás folyamatban...",
-      success: <b>Sikeresen regisztráltál! ✅</b>,
+      success: () => {
+        window.location.href = "/login";
+        return <b>Sikeresen regisztráltál! ✅</b>;
+      },
       error: (err) => {
         const errorMsg =
           err.response?.data?.message || "Hiba történt a regisztráció során.";
@@ -43,6 +48,13 @@ export const RegisterPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[var(--primary-light)] to-[var(--primary)]">
+      <FloatingBlob />
+      <div className="absolute top-4 left-4">
+        <a href="/" aria-label="Főoldal">
+          <img src={logoImage} alt="BüféGO Logo" className="h-8 md:h-10" />
+        </a>
+      </div>
+
       <div className="bg-white p-8 rounded-2xl shadow-lg w-96">
         <h2 className="text-2xl font-bold text-center text-gray-800">
           Regisztráció
@@ -102,7 +114,10 @@ export const RegisterPage = () => {
         </form>
         <p className="text-center mt-4 text-gray-600">
           Már van fiókod?
-          <a href="/login" className="text-orange-500 font-semibold ml-1 cursor-pointer">
+          <a
+            href="/login"
+            className="text-orange-500 font-semibold ml-1 cursor-pointer"
+          >
             Bejelentkezés
           </a>
         </p>

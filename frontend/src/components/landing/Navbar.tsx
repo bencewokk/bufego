@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUserPlus } from '@fortawesome/free-solid-svg-icons';
-import logoImage from '../../bufego.png';
+import logoImage from '../../assets/bufego.png';
 
 export const Navbar = () => {
   return (

@@ -82,7 +82,3 @@ export const register = async (req, res) => {
     res.status(500).json({ message: "Server error: " + error.message });
   }
 };
-
-export const dashboard = async (req, res) => {
-  res.json({ message: "Welcome to dashboard! ", user: req.user });
-};
