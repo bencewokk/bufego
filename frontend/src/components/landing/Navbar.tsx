@@ -1,13 +1,20 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+// Try importing directly - TypeScript will need a module declaration for this to work
+import logoImage from '../../bufego.png';
 
 export const Navbar = () => {
   return (
     <nav className="w-full bg-[var(--background)] shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
-          <div className="text-2xl md:text-3xl font-bold text-[var(--primary)]">
-            BüféGO
+          <div className="flex items-center">
+            {/* Using the imported image */}
+            <img 
+              src={logoImage} 
+              alt="BüféGO Logo" 
+              className="h-8 md:h-10"
+            />
           </div>
 
           <div className="flex items-center gap-4 md:gap-8">
@@ -25,8 +32,8 @@ export const Navbar = () => {
             <a
               href="/register"
               className="bg-[var(--primary)] text-[var(--background)] px-4 py-2 rounded-full 
-                           hover:bg-[var(--primary-light)] transition-colors text-md
-                           flex items-center justify-center gap-2"
+                         hover:bg-[var(--primary-light)] transition-colors text-md
+                         flex items-center justify-center gap-2"
               aria-label="Regisztráció"
             >
               <FontAwesomeIcon 
