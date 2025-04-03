@@ -3,7 +3,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MainPage } from "./pages/_main";
 // Import future pages here as needed
 import { BuffetListPage } from "./pages/_buffets";
-import { LoginPage } from "./pages/_auth.tsx";
+import { RegisterPage } from "./pages/_register.tsx";
+import { LoginPage } from "./pages/_login.tsx";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/buffets" element={<BuffetListPage />} />
+          <Route path="/signup" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           {/* <Route path="/register" element={<RegisterPage />} /> */}
         </Routes>
