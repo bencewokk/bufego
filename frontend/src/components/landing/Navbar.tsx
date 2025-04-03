@@ -13,7 +13,7 @@ export const Navbar = () => {
           <div className="flex items-center gap-4 md:gap-8">
             <a
               href="/login"
-              className="text-[var(--text)] transition-colors text-lg flex items-center gap-2"
+              className="text-[var(--text)] transition-colors text-md flex items-center gap-2"
               aria-label="Bejelentkezés"
             >
               <FontAwesomeIcon 
@@ -25,7 +25,7 @@ export const Navbar = () => {
             <a
               href="/register"
               className="bg-[var(--primary)] text-[var(--background)] px-4 py-2 rounded-full 
-                           hover:bg-[var(--primary-light)] transition-colors text-lg
+                           hover:bg-[var(--primary-light)] transition-colors text-md
                            flex items-center justify-center gap-2"
               aria-label="Regisztráció"
             >
