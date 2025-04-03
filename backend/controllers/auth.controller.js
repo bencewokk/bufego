@@ -38,10 +38,10 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const now = new Date();
+    const { username, email, password } = req.body; // ✅ Email is bekerül
 
-    const year = now.getFullYear().toString().substring(-2);
+    const now = new Date();
+    const year = now.getFullYear().toString().slice(-2); // ✅ Itt volt egy substring(-2) hiba
     const month = (now.getMonth() + 1).toString().padStart(2, "0");
     const day = now.getDate().toString().padStart(2, "0");
     const hours = now.getHours().toString().padStart(2, "0");
@@ -49,18 +49,25 @@ export const register = async (req, res) => {
 
     const registeredDate = `${year}-${month}-${day} ${hours}:${minutes}`;
 
+    // ✅ Ellenőrizni kell, hogy az email már létezik-e
     const existingUser = await Users.findOne({
-      username: username.toLowerCase(),
+      $or: [
+        { username: username.toLowerCase() },
+        { email: email.toLowerCase() },
+      ],
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: "Username already exists" });
+      return res
+        .status(400)
+        .json({ message: "Username or email already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new Users({
       username: username.toLowerCase(),
+      email: email.toLowerCase(), // ✅ Email mentése
       password: hashedPassword,
       accountCreated: registeredDate,
     });
