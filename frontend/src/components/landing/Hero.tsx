@@ -5,7 +5,7 @@ export const Hero = () => {
         <div className="flex flex-col md:flex-row items-center">
           <div className="w-full md:w-1/2 mb-8 md:mb-0">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
-              Gyors és egyszerű étkezés a kampuszon
+              Gyors és egyszerű étkezés az iskoládban
             </h1>
             <p className="text-lg md:text-xl text-white mb-6">
               Keresd meg a legjobb büféket, nézd meg a menüt és rendelj előre - 

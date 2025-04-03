@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUserPlus } from '@fortawesome/free-solid-svg-icons';
-// Try importing directly - TypeScript will need a module declaration for this to work
 import logoImage from '../../bufego.png';
 
 export const Navbar = () => {
@@ -9,12 +8,14 @@ export const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
-            {/* Using the imported image */}
-            <img 
-              src={logoImage} 
-              alt="BüféGO Logo" 
-              className="h-8 md:h-10"
-            />
+            {/* Logo now links to homepage */}
+            <a href="/" aria-label="Főoldal">
+              <img 
+                src={logoImage} 
+                alt="BüféGO Logo" 
+                className="h-8 md:h-10"
+              />
+            </a>
           </div>
 
           <div className="flex items-center gap-4 md:gap-8">

@@ -6,22 +6,22 @@ export const HowItWorks = () => {
     {
       icon: faSearch,
       title: "Keress",
-      description: "Találd meg a közelben lévő büféket vagy keress név szerint!"
+      description: "Találd meg a közelben lévő büféket vagy keress név szerint"
     },
     {
       icon: faListUl,
       title: "Böngéssz",
-      description: "Nézd meg a menüket és válaszd ki kedvenc ételeidet!"
+      description: "Nézd meg a kinálatot és válaszd ki kedvenc ételeidet"
     },
     {
       icon: faShoppingCart,
       title: "Rendelj",
-      description: "Add le a rendelésed és fizesd ki biztonságosan!"
+      description: "Add le a rendelésed és fizesd ki biztonságosan online"
     },
     {
       icon: faUtensils,
       title: "Élvezd",
-      description: "Értesítést kapsz, ha elkészült az ételed. Csak át kell venned!"
+      description: "Értesítést kapsz, ha elkészült az ételed. Csak át kell venned"
     }
   ];
   
