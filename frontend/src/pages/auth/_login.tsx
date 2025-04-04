@@ -41,7 +41,7 @@ export const LoginPage = () => {
       success: (res) => {
         const token = res.data.token;
         localStorage.setItem("accessToken", token);
-        window.location.href = "/dashboard";
+        window.location.href = "/admin";
         return <b>Sikeresen bejelentkeztél!</b>;
       },
       error: (err) => {
