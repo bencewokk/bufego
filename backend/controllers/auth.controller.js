@@ -10,7 +10,7 @@ export const login = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ message: "Incorrect username or password" });
+        .json({ message: "Helytelen felhasználónév vagy jelszó" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -18,7 +18,7 @@ export const login = async (req, res) => {
     if (!isMatch) {
       return res
         .status(400)
-        .json({ message: "Incorrect username or password" });
+        .json({ message: "Helytelen felhasználónév vagy jelszó" });
     }
 
     const token = jwt.sign(
@@ -29,10 +29,10 @@ export const login = async (req, res) => {
       }
     );
 
-    return res.status(200).json({ message: "User found", user, token });
+    return res.status(200).json({ message: "Felhasználó megtalálva", user, token });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error: " + error.message });
+    res.status(500).json({ message: "Szerver hiba: " + error.message });
   }
 };
 
@@ -60,7 +60,7 @@ export const register = async (req, res) => {
     if (existingUser) {
       return res
         .status(400)
-        .json({ message: "Username or email already exists" });
+        .json({ message: "A felhasználónév és email már létezik" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -76,9 +76,9 @@ export const register = async (req, res) => {
 
     return res
       .status(201)
-      .json({ message: "User registered successfully", user: newUser });
+      .json({ message: "Felhasználó sikeresen regisztrálva", user: newUser });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error: " + error.message });
+    res.status(500).json({ message: "Szerver hiba: " + error.message });
   }
 };
