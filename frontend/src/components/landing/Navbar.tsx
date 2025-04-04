@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUserPlus } from '@fortawesome/free-solid-svg-icons';
-import logoImage from '../../bufego.png';
+import logoImage from '../../assets/bufego.png';
 
 export const Navbar = () => {
   return (
@@ -31,7 +31,7 @@ export const Navbar = () => {
               <span className="hidden md:inline">Bejelentkezés</span>
             </a>
             <a
-              href="/register"
+              href="/signup"
               className="bg-[var(--primary)] text-[var(--background)] px-4 py-2 rounded-full 
                          hover:bg-[var(--primary-light)] transition-colors text-md
                          flex items-center justify-center gap-2"

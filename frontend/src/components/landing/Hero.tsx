@@ -1,6 +1,6 @@
 export const Hero = () => {
   return (
-    <div className="bg-gradient-to-r from-[var(--primary-light)] to-[var(--primary)] py-16 md:py-24">
+    <div className="bg-gradient-to-r to-[var(--primary-light)] from-[var(--primary)] py-16 md:py-24">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="w-full md:w-1/2 mb-8 md:mb-0">

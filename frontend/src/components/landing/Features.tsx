@@ -4,16 +4,6 @@ import { faUtensils, faMapMarkerAlt, faMobileAlt, faClock } from '@fortawesome/f
 export const Features = () => {
   const features = [
     {
-      icon: faUtensils,
-      title: "Aktuális menük",
-      description: "Nézd meg a büfék aktuális kínálatát és válaszd ki kedvencedet!"
-    },
-    {
-      icon: faMapMarkerAlt,
-      title: "Helymeghatározás",
-      description: "Találd meg az iskolád büféjét könnyen!"
-    },
-    {
       icon: faMobileAlt,
       title: "Mobil rendelés",
       description: "Rendelj előre és kerüld el a sorban állást!"
@@ -22,6 +12,16 @@ export const Features = () => {
       icon: faClock,
       title: "Időmegtakarítás",
       description: "Spórolj időt az előrendeléssel és értesülj ha elkészült az ételed!"
+    },
+    {
+      icon: faUtensils,
+      title: "Aktuális menük",
+      description: "Nézd meg a büfék aktuális kínálatát és válaszd ki kedvencedet!"
+    },
+    {
+      icon: faMapMarkerAlt,
+      title: "Helymeghatározás",
+      description: "Találd meg az iskolád büféjét könnyen!"
     }
   ];
   

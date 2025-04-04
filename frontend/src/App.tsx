@@ -2,7 +2,10 @@ import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MainPage } from "./pages/_main";
 // Import future pages here as needed
-import { BuffetListPage } from "./pages/BuffetListPage";
+import { BuffetListPage } from "./pages/_buffets";
+import { RegisterPage } from "./pages/_register.tsx";
+import { LoginPage } from "./pages/_login.tsx";
+import { DashboardPage } from "./pages/_dashboard.tsx";
 
 function App() {
   return (
@@ -10,9 +13,10 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainPage />} />
-          {/* Add additional routes here as needed */}
           <Route path="/buffets" element={<BuffetListPage />} />
-          {/* <Route path="/login" element={<LoginPage />} /> */}
+          <Route path="/signup" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           {/* <Route path="/register" element={<RegisterPage />} /> */}
         </Routes>
       </BrowserRouter>
