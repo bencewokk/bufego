@@ -30,10 +30,13 @@ export const Hero = () => {
           </div>
           <div className="w-full md:w-2/5 flex justify-center items-center">
             <a 
-              href="/order" 
-              className="bg-white-400 hover:bg-white-500 text-gray-900 text-2xl md:text-4xl font-extrabold px-10 py-8 rounded-3xl shadow-xl transform transition-all hover:scale-105 text-center w-full md:max-w-md flex items-center justify-center animate-pulse hover:animate-none"
+              href="/buffets" 
+              className="bg-white text-[var(--primary)] px-10 py-6 rounded-lg shadow-md 
+                        font-bold text-xl md:text-2xl uppercase tracking-wide transition-all 
+                        hover:shadow-lg hover:translate-y-1 flex items-center justify-center
+                        w-full md:w-4/5"
             >
-              <span className="text-center uppercase tracking-wider">RENDELJ MOST!</span>
+              Rendelj most
             </a>
           </div>
         </div>
