@@ -1,43 +1,45 @@
 // src/pages/BuffetListPage.tsx
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Navbar } from '../components/landing/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faMapMarkerAlt, faStar, faClock } from '@fortawesome/free-solid-svg-icons';
 
+// Temporary local data store (will be moved to state management later)
+const localBuffets = [
+  {
+    id: 1,
+    name: "Főépület Büfé",
+    location: "Főépület, földszint",
+    rating: 4.5,
+    openingHours: "8:00 - 16:00",
+    image: "/src/buffet1.jpg",
+    tags: ["szendvics", "kávé", "péksütemény"]
+  },
+  {
+    id: 2,
+    name: "Q Épület Étterem",
+    location: "Q épület, 1. emelet",
+    rating: 4.2,
+    openingHours: "10:00 - 18:00",
+    image: "/src/buffet2.jpg",
+    tags: ["meleg étel", "napi menü", "leves"]
+  },
+  {
+    id: 3,
+    name: "Kertészeti Büfé",
+    location: "K épület mellett",
+    rating: 4.7,
+    openingHours: "8:30 - 15:30",
+    image: "/src/buffet3.jpg",
+    tags: ["gyros", "hamburger", "saláta"]
+  }
+];
+
 export const BuffetListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   
-  const buffets = [
-    {
-      id: 1,
-      name: "Főépület Büfé",
-      location: "Főépület, földszint",
-      rating: 4.5,
-      openingHours: "8:00 - 16:00",
-      image: "/src/buffet1.jpg", // You'd need to add these images
-      tags: ["szendvics", "kávé", "péksütemény"]
-    },
-    {
-      id: 2,
-      name: "Q Épület Étterem",
-      location: "Q épület, 1. emelet",
-      rating: 4.2,
-      openingHours: "10:00 - 18:00",
-      image: "/src/buffet2.jpg",
-      tags: ["meleg étel", "napi menü", "leves"]
-    },
-    {
-      id: 3,
-      name: "Kertészeti Büfé",
-      location: "K épület mellett",
-      rating: 4.7,
-      openingHours: "8:30 - 15:30",
-      image: "/src/buffet3.jpg",
-      tags: ["gyros", "hamburger", "saláta"]
-    }
-  ];
-  
-  const filteredBuffets = buffets.filter(buffet => 
+  const filteredBuffets = localBuffets.filter(buffet => 
     buffet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     buffet.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -67,8 +69,8 @@ export const BuffetListPage = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBuffets.map(buffet => (
-            <a 
-              href={`/buffet/${buffet.id}`} 
+            <Link 
+              to={`/buffet/${buffet.id}`}
               key={buffet.id}
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
@@ -104,7 +106,7 @@ export const BuffetListPage = () => {
                   ))}
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

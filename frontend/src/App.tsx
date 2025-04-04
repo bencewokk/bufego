@@ -1,26 +1,24 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MainPage } from "./pages/_main";
-// Import future pages here as needed
 import { BuffetListPage } from "./pages/_buffets";
-import { RegisterPage } from "./pages/_register.tsx";
-import { LoginPage } from "./pages/_login.tsx";
-import { DashboardPage } from "./pages/_dashboard.tsx";
+import { BuffetDetailsPage } from "./pages/BuffetDetailsPage";
+import { RegisterPage } from "./pages/_register";
+import { LoginPage } from "./pages/_login";
+import { DashboardPage } from "./pages/_dashboard";
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/buffets" element={<BuffetListPage />} />
-          <Route path="/signup" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          {/* <Route path="/register" element={<RegisterPage />} /> */}
-        </Routes>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/buffets" element={<BuffetListPage />} />
+        <Route path="/buffet/:id" element={<BuffetDetailsPage />} />
+        <Route path="/signup" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
