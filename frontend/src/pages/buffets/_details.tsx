@@ -1,11 +1,8 @@
 // src/pages/BuffetDetailsPage.tsx
 import { useParams, Link } from 'react-router-dom';
-<<<<<<< HEAD:frontend/src/pages/BuffetDetailsPage.tsx
 import { useRef, useEffect, useState } from 'react';
-import { Navbar } from '../components/landing/Navbar';
-=======
+
 import { Navbar } from '../../components/landing/Navbar';
->>>>>>> bf886a8f91e36323e9a033d42f8cf40982c0b3ec:frontend/src/pages/buffets/_details.tsx
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faMapMarkerAlt, 
@@ -14,6 +11,7 @@ import {
   faUtensils,
   faArrowLeft
 } from '@fortawesome/free-solid-svg-icons';
+import { useIntersection } from '../../hooks/useIntersection';
 
 // Temporary data (replace with API calls later)
 const localBuffets = [
@@ -76,26 +74,16 @@ export const BuffetDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const buffet = localBuffets.find(b => b.id === Number(id));
 
-  // Scroll-based active category navigation
-  const [activeCategory, setActiveCategory] = useState('');
-  const categoryRefs = useRef<{ [key: string]: HTMLElement }>({});
+  // Remove the old scroll listener and activeCategory state
+  // Replace with Intersection Observer for tracking visible categories:
+  const [categoryElements, setCategoryElements] = useState<HTMLElement[]>([]);
+  const visibleCategories = useIntersection(categoryElements, "-100px 0px -50% 0px");
 
-  const handleScroll = () => {
-    const scrollPosition = window.scrollY + 100;
-    Object.entries(categoryRefs.current).forEach(([category, el]) => {
-      if (
-        el.offsetTop <= scrollPosition &&
-        el.offsetTop + el.offsetHeight > scrollPosition
-      ) {
-        setActiveCategory(category);
-      }
-    });
+  const setCategoryRef = (element: HTMLElement | null) => {
+    if (element && !categoryElements.includes(element)) {
+      setCategoryElements(prev => [...prev, element]);
+    }
   };
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   if (!buffet) {
     return (
@@ -175,39 +163,40 @@ export const BuffetDetailsPage = () => {
         </div>
 
         {/* Sticky Category Navigation */}
-        <div className="sticky top-20 z-10 bg-white py-4 mb-6 border-b">
-          <div className="flex flex-wrap gap-4">
-            {buffet.menu.map((category, index) => (
-              <a 
-                key={index}
-                href={`#${category.category}`}
-                className={`px-4 py-2 rounded-full ${
-                  activeCategory === category.category 
-                    ? 'bg-[var(--primary)] text-white' 
-                    : 'bg-gray-100 hover:bg-gray-200'
-                }`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById(category.category)?.scrollIntoView({
-                    behavior: 'smooth'
-                  });
-                }}
-              >
-                {category.category}
-              </a>
-            ))}
+        <div className="sticky top-0 z-20 bg-white py-4 mb-6 border-b shadow-sm">
+          <div className="overflow-x-auto pb-2">
+            <div className="flex gap-3 px-1">
+              {buffet.menu.map((category, index) => (
+                <a
+                  key={index}
+                  href={`#${category.category}`}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    visibleCategories.has(category.category)
+                      ? 'bg-[var(--primary)] text-white shadow-md'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800'
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById(category.category)?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start'
+                    });
+                  }}
+                >
+                  {category.category}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Menu Section with Refs */}
-        {buffet.menu.map((category, index) =>   (
+        {buffet.menu.map((category, index) => (
           <div 
             key={index} 
             id={category.category}
-            ref={(el) => {
-              if (el) categoryRefs.current[category.category] = el;
-            }}
-            className="mb-8 scroll-mt-24"
+            ref={setCategoryRef}
+            className="mb-8 scroll-mt-28"
           >
             <h3 className="text-xl font-semibold mb-4 border-b-2 border-gray-200 pb-2">
               {category.category}
