@@ -1,10 +1,10 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MainPage } from "./pages/_main";
-import { BuffetListPage } from "./pages/_buffets";
-import { BuffetDetailsPage } from "./pages/BuffetDetailsPage";
-import { RegisterPage } from "./pages/_register";
-import { LoginPage } from "./pages/_login";
+import { BuffetListPage } from "./pages/buffets/_buffets";
+import { BuffetDetailsPage } from "./pages/buffets/_details";
+import { RegisterPage } from "./pages/auth/_register";
+import { LoginPage } from "./pages/auth/_login";
 import { DashboardPage } from "./pages/_dashboard";
 
 function App() {

@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import logoImage from '../assets/bufego.png';
-import { FloatingBlob } from "../components/design/Blob";
+import logoImage from '../../assets/bufego.png';
+import { FloatingBlob } from "../../components/design/Blob";
 
 const GeometricBackground = () => (
   <div className="absolute inset-0 overflow-hidden opacity-10">
@@ -42,7 +42,7 @@ export const LoginPage = () => {
         const token = res.data.token;
         localStorage.setItem("accessToken", token);
         window.location.href = "/dashboard";
-        return <b>Sikeresen bejelentkeztél! ✅</b>;
+        return <b>Sikeresen bejelentkeztél!</b>;
       },
       error: (err) => {
         const errorMsg =
@@ -96,7 +96,7 @@ export const LoginPage = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-[var(--primary)] text-white py-3 rounded-lg font-semibold uppercase tracking-wide hover:bg-[var(--primary-dark)] transition-colors"
+            className="w-full bg-[var(--primary)] text-white py-3 rounded-lg font-semibold uppercase tracking-wide hover:bg-[var(--primary-dark)] transition-colors cursor-pointer"
           >
             Bejelentkezés
           </button>
