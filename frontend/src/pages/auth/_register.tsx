@@ -1,8 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import { FloatingBlob } from "../components/design/Blob";
-import logoImage from '../assets/bufego.png';
+import { FloatingBlob } from "../../components/design/Blob";
+import logoImage from '../../assets/bufego.png';
 
 const GeometricBackground = () => (
   <div className="absolute inset-0 overflow-hidden opacity-10">
@@ -44,7 +44,7 @@ export const RegisterPage = () => {
       loading: "Regisztrálás folyamatban...",
       success: () => {
         window.location.href = "/login";
-        return <b>Sikeresen regisztráltál! ✅</b>;
+        return <b>Sikeresen regisztráltál!</b>;
       },
       error: (err) => {
         const errorMsg =
@@ -128,7 +128,7 @@ export const RegisterPage = () => {
 
           <button
             type="submit"
-            className="w-full bg-[var(--primary)] text-white py-3 rounded-lg font-semibold uppercase tracking-wide hover:bg-[var(--primary-dark)] transition-colors"
+            className="w-full bg-[var(--primary)] text-white py-3 rounded-lg font-semibold uppercase tracking-wide hover:bg-[var(--primary-dark)] transition-colors cursor-pointer"
           >
             Regisztráció
           </button>

@@ -1,6 +1,6 @@
 // src/pages/BuffetDetailsPage.tsx
 import { useParams, Link } from 'react-router-dom';
-import { Navbar } from '../components/landing/Navbar';
+import { Navbar } from '../../components/landing/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faMapMarkerAlt, 
