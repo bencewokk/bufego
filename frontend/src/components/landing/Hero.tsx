@@ -2,7 +2,7 @@ export const Hero = () => {
   return (
     <div className="bg-gradient-to-r from-[var(--primary-light)] to-[var(--primary)] py-16 md:py-24">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-center">
+        <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="w-full md:w-1/2 mb-8 md:mb-0">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
               Gyors és egyszerű étkezés az iskoládban
@@ -27,6 +27,14 @@ export const Hero = () => {
                 Tudj meg többet
               </a>
             </div>
+          </div>
+          <div className="w-full md:w-2/5 flex justify-center items-center">
+            <a 
+              href="/order" 
+              className="bg-white-400 hover:bg-white-500 text-gray-900 text-2xl md:text-4xl font-extrabold px-10 py-8 rounded-3xl shadow-xl transform transition-all hover:scale-105 text-center w-full md:max-w-md flex items-center justify-center animate-pulse hover:animate-none"
+            >
+              <span className="text-center uppercase tracking-wider">RENDELJ MOST!</span>
+            </a>
           </div>
         </div>
       </div>

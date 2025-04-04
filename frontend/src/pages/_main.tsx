@@ -8,8 +8,9 @@ export const MainPage = () => {
     <div>
       <Navbar />
       <Hero />
-      <Features />
       <HowItWorks />
+      <Features />
+
       
       {/* You could add more sections here like:
           - Popular Locations
