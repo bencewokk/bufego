@@ -86,15 +86,15 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-[var(--admin-background)]">
       {/* Navbar */}
       <DashboardNav username={username} handleLogout={handleLogout} />
 
       {/* Add Buffet Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md animate-fade-in">
-            <h3 className="text-2xl font-bold mb-4 text-[var(--primary-dark)]">
+          <div className="bg-[var(--admin-surface)] rounded-lg p-6 w-full max-w-md animate-fade-in">
+            <h3 className="text-2xl font-bold mb-4 text-[var(--admin-primary-dark)]">
               Új Büfé
             </h3>
 
@@ -153,13 +153,13 @@ export const AdminDashboard = () => {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-[var(--admin-text)] hover:text-[var(--admin-primary-dark)]"
               >
                 Mégse
               </button>
               <button
                 onClick={handleAddBuffet}
-                className="px-4 py-2 bg-[var(--primary)] text-white rounded hover:bg-[var(--primary-dark)]"
+                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-primary-dark)]"
               >
                 Mentés
               </button>
@@ -171,10 +171,10 @@ export const AdminDashboard = () => {
       {/* Main Content */}
       <main className="p-4 md:p-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-[var(--text)]">Büfék</h2>
+          <h2 className="text-2xl font-bold text-[var(--admin-text)]">Büfék</h2>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-[#ff9800] text-white px-4 py-2 rounded-md hover:bg-[#ff8a00] transition-colors cursor-pointer"
+            className="bg-[var(--admin-primary)] text-white px-4 py-2 rounded-md hover:bg-[var(--admin-primary-dark)] transition-colors cursor-pointer"
           >
             + Új Büfé
           </button>
@@ -185,10 +185,10 @@ export const AdminDashboard = () => {
             <Link
               to={`/admin/buffet/${buffet.id}`}
               key={buffet.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              className="bg-[var(--admin-surface)] rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
             >
               <div className="h-48 bg-gray-200 relative">
-                <div className="absolute bottom-0 left-0 bg-[var(--primary)] text-white px-3 py-1 rounded-tr-lg">
+                <div className="absolute bottom-0 left-0 bg-[var(--admin-primary)] text-white px-3 py-1 rounded-tr-lg">
                   <FontAwesomeIcon icon={faClock} className="mr-2" />
                   {buffet.openingHours}
                 </div>
@@ -196,19 +196,19 @@ export const AdminDashboard = () => {
 
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
-                  <h2 className="text-xl font-semibold text-[var(--text)]">
+                  <h2 className="text-xl font-semibold text-[var(--admin-text)]">
                     {buffet.name}
                   </h2>
-                  <div className="flex items-center bg-yellow-100 px-2 py-1 rounded">
+                  <div className="flex items-center bg-[var(--admin-primary-light)] px-2 py-1 rounded">
                     <FontAwesomeIcon
                       icon={faStar}
-                      className="text-yellow-500 mr-1"
+                      className="text-[var(--admin-primary)] mr-1"
                     />
                     <span className="font-medium">{buffet.rating}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center text-gray-600 mb-3">
+                <div className="flex items-center text-[var(--admin-text)] mb-3">
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
                   <span>{buffet.location}</span>
                 </div>
@@ -217,7 +217,7 @@ export const AdminDashboard = () => {
                   {buffet.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-sm"
+                      className="bg-[var(--admin-primary-light)] text-[var(--admin-primary)] px-2 py-1 rounded-full text-sm"
                     >
                       {tag}
                     </span>

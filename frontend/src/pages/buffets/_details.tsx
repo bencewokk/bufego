@@ -74,16 +74,24 @@ export const BuffetDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const buffet = localBuffets.find(b => b.id === Number(id));
 
-  // Remove the old scroll listener and activeCategory state
-  // Replace with Intersection Observer for tracking visible categories:
+  // Enhanced category tracking with Intersection Observer
   const [categoryElements, setCategoryElements] = useState<HTMLElement[]>([]);
-  const visibleCategories = useIntersection(categoryElements, "-100px 0px -50% 0px");
+  const { visibleElements: visibleCategories, visibilityPercentages } = useIntersection(categoryElements, "-100px 0px -300px 0px");
 
+  // Use a ref callback to collect category elements
   const setCategoryRef = (element: HTMLElement | null) => {
-    if (element && !categoryElements.includes(element)) {
+    if (element && !categoryElements.some(el => el.id === element.id)) {
       setCategoryElements(prev => [...prev, element]);
     }
   };
+
+  // Make sure all categories are observed after rendering
+  useEffect(() => {
+    const elements = Array.from(document.querySelectorAll('[data-category-section]')) as HTMLElement[];
+    if (elements.length > 0 && elements.length !== categoryElements.length) {
+      setCategoryElements(elements);
+    }
+  }, [buffet]);
 
   if (!buffet) {
     return (
@@ -166,37 +174,57 @@ export const BuffetDetailsPage = () => {
         <div className="sticky top-0 z-20 bg-white py-4 mb-6 border-b shadow-sm">
           <div className="overflow-x-auto pb-2">
             <div className="flex gap-3 px-1">
-              {buffet.menu.map((category, index) => (
-                <a
-                  key={index}
-                  href={`#${category.category}`}
-                  className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    visibleCategories.has(category.category)
-                      ? 'bg-[var(--primary)] text-white shadow-md'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800'
-                  }`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById(category.category)?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start'
-                    });
-                  }}
-                >
-                  {category.category}
-                </a>
-              ))}
+              {buffet.menu.map((category, index) => {
+                const isVisible = visibleCategories.has(category.category);
+                const visibilityPercent = visibilityPercentages[category.category] || 0;
+                
+                return (
+                  <a
+                    key={index}
+                    href={`#${category.category}`}
+                    className={`relative whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 overflow-hidden ${
+                      isVisible ? 'text-white shadow-md' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800'
+                    }`}
+                    style={{
+                      backgroundColor: isVisible 
+                        ? `color-mix(in srgb, var(--primary) ${visibilityPercent}%, var(--primary-dark))`
+                        : '',
+                      transform: isVisible 
+                        ? `scale(${1 + (visibilityPercent / 500)})`
+                        : 'scale(1)',
+                      transition: 'all 150ms ease-out'
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById(category.category)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                      });
+                    }}
+                  >
+                    {isVisible && (
+                      <div 
+                        className="absolute inset-0 bg-white opacity-20 blur-sm"
+                        style={{ opacity: visibilityPercent / 300 }}
+                      />
+                    )}
+                    <span className="relative z-10">{category.category}</span>
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
 
+        {/* todo ezt jora meg kell csinalni */}
         {/* Menu Section with Refs */}
         {buffet.menu.map((category, index) => (
           <div 
             key={index} 
             id={category.category}
             ref={setCategoryRef}
-            className="mb-8 scroll-mt-28"
+            data-category-section
+            className="mb-8 scroll-mt-28 pb-12"
           >
             <h3 className="text-xl font-semibold mb-4 border-b-2 border-gray-200 pb-2">
               {category.category}

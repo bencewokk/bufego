@@ -5,10 +5,30 @@
 }
 
 :root {
+  /* Original theme (keep for main site) */
   --background: #ffffffff;
   --secondary: #ffe6c0ff;
   --primary-light: #ffb340ff;
-  --primary-dark: #804d00;
   --primary: #ff9800;
+  --primary-dark: #804d00;
   --text: #333333;
+
+  --primary-500: var(--primary-light);
+  --primary-600: color-mix(in srgb, var(--primary-light) 80%, var(--primary));
+  --primary-700: var(--primary);
+  --primary-800: color-mix(in srgb, var(--primary) 80%, var(--primary-dark));
+  --primary-900: var(--primary-dark);
+
+  /* New admin-specific variables */
+  --admin-background: #f8fafc;
+  --admin-surface: #ffffff;
+  --admin-primary-light: #93c5fd;
+  --admin-primary: #2563eb; /* Tailwind's blue-600 */
+  --admin-primary-dark: rgb(29, 78, 216);
+  --admin-text: #1e293b;
+
+
+  --admin-error: #dc2626;
+  --admin-success: #16a34a;
+
 }
