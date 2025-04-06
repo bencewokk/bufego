@@ -9,44 +9,32 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { DashboardNav } from "../../components/Dashboard/DashboardNav";
 
+// Update Buffet interface to use string id (MongoDB ObjectId)
 interface Buffet {
-  id: number;
+  id: string; // Changed from number to string to match MongoDB _id
   name: string;
   location: string;
   rating: number;
   openingHours: string;
   image: string;
-  tags: string[]; // Explicitly type the tags array
+  tags: string[];
 }
 
 export const AdminDashboard = () => {
   const [username, setUsername] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
-
-  const [newBuffet, setNewBuffet] = useState<Buffet>({
-    id: 0,
+  const [buffets, setBuffets] = useState<Buffet[]>([]); // Initialize as empty array
+  const [newBuffet, setNewBuffet] = useState<Omit<Buffet, "id">>({
     name: "",
     location: "",
     rating: 0,
     openingHours: "",
     image: "/src/buffet1.jpg",
-    tags: [], // Now properly typed as string[]
+    tags: [],
   });
-  const [buffets, setBuffets] = useState([
-    {
-      id: 1,
-      name: "Főépület Büfé",
-      location: "Főépület, földszint",
-      rating: 4.5,
-      openingHours: "8:00 - 16:00",
-      image: "/src/buffet1.jpg",
-      tags: ["szendvics", "kávé", "péksütemény"],
-    },
-    // ... other buffet objects
-  ]);
   const navigate = useNavigate();
 
-  // Auth check (same as before)
+  // Check authentication (unchanged)
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const url = "http://localhost:3000/api/dashboard";
@@ -64,25 +52,52 @@ export const AdminDashboard = () => {
       .catch(() => navigate("/"));
   }, [navigate]);
 
+  // Fetch buffets from MongoDB on component mount
+  useEffect(() => {
+    const fetchBuffets = async () => {
+      const token = localStorage.getItem("accessToken");
+      const url = "http://localhost:3000/api/buffets";
+      const headers = { Authorization: `Bearer ${token}` };
+
+      try {
+        const response = await axios.get(url, { headers });
+        setBuffets(response.data);
+      } catch (error) {
+        console.error("Error fetching buffets:", error);
+      }
+    };
+
+    fetchBuffets();
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     navigate("/");
   };
 
-  const handleAddBuffet = () => {
-    const newId =
-      buffets.length > 0 ? Math.max(...buffets.map((b) => b.id)) + 1 : 1;
-    setBuffets([...buffets, { ...newBuffet, id: newId }]);
-    setShowAddModal(false);
-    setNewBuffet({
-      id: 1,
-      name: "",
-      location: "",
-      rating: 0,
-      openingHours: "",
-      image: "/src/buffet1.jpg",
-      tags: [],
-    });
+  // Save new buffet to MongoDB
+  const handleAddBuffet = async () => {
+    const token = localStorage.getItem("accessToken");
+    const url = "http://localhost:3000/api/buffets";
+    const headers = { Authorization: `Bearer ${token}` };
+
+    try {
+      const response = await axios.post(url, newBuffet, { headers });
+      const savedBuffet = response.data; // Includes the server-assigned id
+      setBuffets([...buffets, savedBuffet]); // Add the saved buffet to state
+      setShowAddModal(false);
+      setNewBuffet({
+        name: "",
+        location: "",
+        rating: 0,
+        openingHours: "",
+        image: "/src/buffet1.jpg",
+        tags: [],
+      });
+    } catch (error) {
+      console.error("Error saving buffet:", error);
+      // Optionally, show an error message to the user
+    }
   };
 
   return (
@@ -144,7 +159,8 @@ export const AdminDashboard = () => {
                     ...newBuffet,
                     tags: e.target.value
                       .split(",")
-                      .filter((tag) => tag.trim() !== ""),
+                      .map((tag) => tag.trim())
+                      .filter((tag) => tag !== ""),
                   })
                 }
               />
