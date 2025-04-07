@@ -1,6 +1,6 @@
 import express from "express";
-import Buffet from "../models/buffet_model.js";
-import { authenticate } from "../middleware/auth_middleware.js"; // Changed to named import
+import Buffet from "../models/buffet.model.js";
+import { authenticate } from "../middleware/auth.middleware.js"; // Changed to named import
 
 const router = express.Router();
 
@@ -19,7 +19,7 @@ router.post("/", authenticate, async (req, res) => { // Use authenticate instead
 });
 
 // GET: Fetch all buffets (protected route)
-router.get("/", authenticate, async (req, res) => { // Use authenticate instead of authMiddleware
+router.get("/", async (req, res) => { // Use authenticate instead of authMiddleware
   try {
     const buffets = await Buffet.find();
     res.status(200).json(buffets);

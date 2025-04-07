@@ -14,6 +14,8 @@ import { DashboardNav } from "../../components/Dashboard/DashboardNav";
 interface Buffet {
   id: string; // Changed from number to string to match MongoDB _id
   name: string;
+  email: string;
+  password: string; // Add password field for authentication
   location: string;
   openingHours: string;
   image: string;
@@ -30,6 +32,8 @@ export const AdminDashboard = () => {
     name: "",
     location: "",
     openingHours: "",
+    email: "",
+    password: "",
     image: "/src/buffet1.jpg",
     tags: [],
   });
@@ -85,12 +89,15 @@ export const AdminDashboard = () => {
     try {
       const response = await axios.post(url, newBuffet, { headers });
       const savedBuffet = response.data; // Includes the server-assigned id
+      console.log("Saved buffet:", savedBuffet); // Log the saved buffet
       setBuffets([...buffets, savedBuffet]); // Add the saved buffet to state
       setShowAddModal(false);
       setNewBuffet({
         name: "",
         location: "",
         openingHours: "",
+        email: "",
+        password: "",
         image: "/src/buffet1.jpg",
         tags: [],
       });
@@ -191,16 +198,19 @@ export const AdminDashboard = () => {
               />
               <input
                 type="text"
-                placeholder="Címkék (vesszővel elválasztva)"
+                placeholder="Email cím"
                 className="w-full p-2 border rounded"
                 onChange={(e) =>
-                  setNewBuffet({
-                    ...newBuffet,
-                    tags: e.target.value
-                      .split(",")
-                      .map((tag) => tag.trim())
-                      .filter((tag) => tag !== ""),
-                  })
+                  setNewBuffet({ ...newBuffet, email: e.target.value })
+
+                }
+              />
+              <input
+                type="text"
+                placeholder="Jelszó"
+                className="w-full p-2 border rounded"
+                onChange={(e) =>
+                  setNewBuffet({ ...newBuffet, password: e.target.value })
                 }
               />
             </div>
@@ -344,7 +354,8 @@ export const AdminDashboard = () => {
                   </div>
                 </div>
               </Link>
-              
+              {/* Todo: Email validation*/}
+
               {/* Action buttons */}
               <div className="absolute top-2 right-2 flex gap-2">
                 <button
