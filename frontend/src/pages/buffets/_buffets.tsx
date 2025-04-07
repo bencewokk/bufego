@@ -90,13 +90,13 @@ export const BuffetListPage = () => {
             <div className="text-lg text-red-600">{error}</div>
             <button 
               onClick={() => window.location.reload()}
-              className="ml-4 px-4 py-2 bg-[var(--primary)] text-white rounded hover:bg-opacity-90 transition-colors"
+              className="ml-4 px-4 py-2 bg-[var(--primary)] text-white rounded hover:bg-opacity-90 transition-colors cursor-pointer"
             >
               Újrapróbálkozás
             </button>
           </div>
         ) : filteredBuffets.length === 0 ? (
-          <div className="flex justify-center items-center h-64">
+          <div className="flex justify-center items-center h-64">sa
             <div className="text-lg text-gray-600">Nincs találat</div>
           </div>
         ) : (
