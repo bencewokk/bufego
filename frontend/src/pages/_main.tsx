@@ -9,7 +9,6 @@ export const MainPage = () => {
       <Navbar />
       <Hero />
       <HowItWorks />
-      <Features />
 
       
       {/* You could add more sections here like:
