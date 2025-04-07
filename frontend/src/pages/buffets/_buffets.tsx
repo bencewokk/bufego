@@ -92,7 +92,7 @@ export const BuffetListPage = () => {
               onClick={() => window.location.reload()}
               className="ml-4 px-4 py-2 bg-[var(--primary)] text-white rounded hover:bg-opacity-90 transition-colors"
             >
-              Újra próbálkozás
+              Újrapróbálkozás
             </button>
           </div>
         ) : filteredBuffets.length === 0 ? (
