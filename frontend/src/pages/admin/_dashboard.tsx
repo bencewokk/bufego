@@ -186,7 +186,7 @@ export const AdminDashboard = () => {
                 }
               />
               <input
-                type="text"
+                type="email"
                 placeholder="Email cím"
                 value={newBuffet.email}
                 className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
@@ -290,7 +290,7 @@ export const AdminDashboard = () => {
                 onClick={handleEditBuffet}
                 className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-primary-dark)] cursor-pointer"
               >
-                Mentés
+                Mentés  
               </button>
             </div>
           </div>
@@ -350,14 +350,14 @@ export const AdminDashboard = () => {
               <div className="absolute top-2 right-2 flex gap-2">
                 <button
                   onClick={(e) => handleOpenEditModal(buffet, e)}
-                  className="bg-[var(--admin-primary-light)] text-[var(--admin-primary)] p-2 rounded-full hover:bg-[var(--admin-primary)] hover:text-white transition-colors cursor-pointer"
+                  className="bg-[var(--admin-primary-light)] text-[var(--admin-primary)] h-[35px] w-[35px] rounded hover:bg-[var(--admin-primary)] hover:text-white transition-colors cursor-pointer"
                   title="Szerkesztés"
                 >
                   <FontAwesomeIcon icon={faPencilAlt} />
                 </button>
                 <button
                   onClick={(e) => handleDeleteBuffet(buffet.id, e)}
-                  className="bg-red-100 text-red-500 p-2 rounded-full hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
+                  className="bg-red-100 text-red-500 h-[35px] w-[35px] rounded hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
                   title="Törlés"
                 >
                   <FontAwesomeIcon icon={faTrash} />
