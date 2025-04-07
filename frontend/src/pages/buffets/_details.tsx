@@ -1,6 +1,6 @@
 // src/pages/BuffetDetailsPage.tsx
 import { useParams, Link } from 'react-router-dom';
-import { useRef, useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 
 import { Navbar } from '../../components/landing/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,7 +8,6 @@ import {
   faMapMarkerAlt, 
   faStar, 
   faClock, 
-  faUtensils,
   faArrowLeft
 } from '@fortawesome/free-solid-svg-icons';
 import { useIntersection } from '../../hooks/useIntersection';

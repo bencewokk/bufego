@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Navbar } from '../components/landing/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faMapMarkerAlt, faStar, faClock } from '@fortawesome/free-solid-svg-icons';
-import React from 'react';
 
 // Temporary local data store (will be moved to state management later)
 const localBuffets = [
