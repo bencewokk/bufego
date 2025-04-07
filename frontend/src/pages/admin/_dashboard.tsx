@@ -6,6 +6,8 @@ import {
   faClock,
   faMapMarkerAlt,
   faStar,
+  faPencilAlt,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { DashboardNav } from "../../components/Dashboard/DashboardNav";
 
@@ -23,7 +25,9 @@ interface Buffet {
 export const AdminDashboard = () => {
   const [username, setUsername] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [buffets, setBuffets] = useState<Buffet[]>([]); // Initialize as empty array
+  const [currentBuffet, setCurrentBuffet] = useState<Buffet | null>(null);
   const [newBuffet, setNewBuffet] = useState<Omit<Buffet, "id">>({
     name: "",
     location: "",
@@ -98,6 +102,54 @@ export const AdminDashboard = () => {
       console.error("Error saving buffet:", error);
       // Optionally, show an error message to the user
     }
+  };
+
+  // Update existing buffet
+  const handleEditBuffet = async () => {
+    if (!currentBuffet) return;
+    
+    const token = localStorage.getItem("accessToken");
+    const url = `http://localhost:3000/api/buffets/${currentBuffet.id}`;
+    const headers = { Authorization: `Bearer ${token}` };
+
+    try {
+      await axios.put(url, currentBuffet, { headers });
+      
+      // Update the buffet in the state
+      setBuffets(buffets.map(b => b.id === currentBuffet.id ? currentBuffet : b));
+      setShowEditModal(false);
+      setCurrentBuffet(null);
+    } catch (error) {
+      console.error("Error updating buffet:", error);
+    }
+  };
+
+  // Delete buffet
+  const handleDeleteBuffet = async (id: string, event: React.MouseEvent) => {
+    event.preventDefault(); // Prevent navigation
+    event.stopPropagation(); // Stop event propagation
+    
+    if (window.confirm("Biztosan törölni szeretnéd ezt a büfét?")) {
+      const token = localStorage.getItem("accessToken");
+      const url = `http://localhost:3000/api/buffets/${id}`;
+      const headers = { Authorization: `Bearer ${token}` };
+
+      try {
+        await axios.delete(url, { headers });
+        // Remove the deleted buffet from state
+        setBuffets(buffets.filter(buffet => buffet.id !== id));
+      } catch (error) {
+        console.error("Error deleting buffet:", error);
+      }
+    }
+  };
+
+  // Open edit modal with selected buffet data
+  const handleOpenEditModal = (buffet: Buffet, event: React.MouseEvent) => {
+    event.preventDefault(); // Prevent navigation
+    event.stopPropagation(); // Stop event propagation
+    setCurrentBuffet({ ...buffet });
+    setShowEditModal(true);
   };
 
   return (
@@ -184,6 +236,86 @@ export const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Edit Buffet Modal */}
+      {showEditModal && currentBuffet && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-[var(--admin-surface)] rounded-lg p-6 w-full max-w-md animate-fade-in">
+            <h3 className="text-2xl font-bold mb-4 text-[var(--admin-primary-dark)]">
+              Büfé Szerkesztése
+            </h3>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Név"
+                className="w-full p-2 border rounded"
+                value={currentBuffet.name}
+                onChange={(e) =>
+                  setCurrentBuffet({ ...currentBuffet, name: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                placeholder="Helyszín"
+                className="w-full p-2 border rounded"
+                value={currentBuffet.location}
+                onChange={(e) =>
+                  setCurrentBuffet({ ...currentBuffet, location: e.target.value })
+                }
+              />
+              <input
+                type="number"
+                placeholder="Értékelés"
+                className="w-full p-2 border rounded"
+                value={currentBuffet.rating}
+                onChange={(e) =>
+                  setCurrentBuffet({ ...currentBuffet, rating: Number(e.target.value) })
+                }
+              />
+              <input
+                type="text"
+                placeholder="Nyitvatartás"
+                className="w-full p-2 border rounded"
+                value={currentBuffet.openingHours}
+                onChange={(e) =>
+                  setCurrentBuffet({ ...currentBuffet, openingHours: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                placeholder="Címkék (vesszővel elválasztva)"
+                className="w-full p-2 border rounded"
+                value={currentBuffet.tags.join(", ")}
+                onChange={(e) =>
+                  setCurrentBuffet({
+                    ...currentBuffet,
+                    tags: e.target.value
+                      .split(",")
+                      .map((tag) => tag.trim())
+                      .filter((tag) => tag !== ""),
+                  })
+                }
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 text-[var(--admin-text)] hover:text-[var(--admin-primary-dark)]"
+              >
+                Mégse
+              </button>
+              <button
+                onClick={handleEditBuffet}
+                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-primary-dark)]"
+              >
+                Mentés
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="p-4 md:p-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
@@ -198,49 +330,68 @@ export const AdminDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {buffets.map((buffet) => (
-            <Link
-              to={`/admin/buffet/${buffet.id}`}
+            <div
               key={buffet.id}
-              className="bg-[var(--admin-surface)] rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              className="bg-[var(--admin-surface)] rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative"
             >
-              <div className="h-48 bg-gray-200 relative">
-                <div className="absolute bottom-0 left-0 bg-[var(--admin-primary)] text-white px-3 py-1 rounded-tr-lg">
-                  <FontAwesomeIcon icon={faClock} className="mr-2" />
-                  {buffet.openingHours}
-                </div>
-              </div>
-
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h2 className="text-xl font-semibold text-[var(--admin-text)]">
-                    {buffet.name}
-                  </h2>
-                  <div className="flex items-center bg-[var(--admin-primary-light)] px-2 py-1 rounded">
-                    <FontAwesomeIcon
-                      icon={faStar}
-                      className="text-[var(--admin-primary)] mr-1"
-                    />
-                    <span className="font-medium">{buffet.rating}</span>
+              <Link to={`/admin/buffet/${buffet.id}`}>
+                <div className="h-48 bg-gray-200 relative">
+                  <div className="absolute bottom-0 left-0 bg-[var(--admin-primary)] text-white px-3 py-1 rounded-tr-lg">
+                    <FontAwesomeIcon icon={faClock} className="mr-2" />
+                    {buffet.openingHours}
                   </div>
                 </div>
 
-                <div className="flex items-center text-[var(--admin-text)] mb-3">
-                  <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-                  <span>{buffet.location}</span>
-                </div>
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h2 className="text-xl font-semibold text-[var(--admin-text)]">
+                      {buffet.name}
+                    </h2>
+                    <div className="flex items-center bg-[var(--admin-primary-light)] px-2 py-1 rounded">
+                      <FontAwesomeIcon
+                        icon={faStar}
+                        className="text-[var(--admin-primary)] mr-1"
+                      />
+                      <span className="font-medium">{buffet.rating}</span>
+                    </div>
+                  </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {buffet.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="bg-[var(--admin-primary-light)] text-[var(--admin-primary)] px-2 py-1 rounded-full text-sm"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  <div className="flex items-center text-[var(--admin-text)] mb-3">
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
+                    <span>{buffet.location}</span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {buffet.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="bg-[var(--admin-primary-light)] text-[var(--admin-primary)] px-2 py-1 rounded-full text-sm"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+              </Link>
+              
+              {/* Action buttons */}
+              <div className="absolute top-2 right-2 flex gap-2">
+                <button
+                  onClick={(e) => handleOpenEditModal(buffet, e)}
+                  className="bg-[var(--admin-primary-light)] text-[var(--admin-primary)] p-2 rounded-full hover:bg-[var(--admin-primary)] hover:text-white transition-colors"
+                  title="Szerkesztés"
+                >
+                  <FontAwesomeIcon icon={faPencilAlt} />
+                </button>
+                <button
+                  onClick={(e) => handleDeleteBuffet(buffet.id, e)}
+                  className="bg-red-100 text-red-500 p-2 rounded-full hover:bg-red-500 hover:text-white transition-colors"
+                  title="Törlés"
+                >
+                  <FontAwesomeIcon icon={faTrash} />
+                </button>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </main>
