@@ -28,4 +28,41 @@ router.get("/", authenticate, async (req, res) => { // Use authenticate instead 
   }
 });
 
+// PUT: Update a buffet by ID (protected route)
+router.put("/:id", authenticate, async (req, res) => {
+  try {
+    const updatedBuffet = await Buffet.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    
+    if (!updatedBuffet) {
+      return res.status(404).json({ message: "Buffet not found" });
+    }
+    
+    res.status(200).json(updatedBuffet);
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: "Validation error", details: error.errors });
+    }
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// DELETE: Remove a buffet by ID (protected route)
+router.delete("/:id", authenticate, async (req, res) => {
+  try {
+    const deletedBuffet = await Buffet.findByIdAndDelete(req.params.id);
+    
+    if (!deletedBuffet) {
+      return res.status(404).json({ message: "Buffet not found" });
+    }
+    
+    res.status(200).json({ message: "Buffet deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;
