@@ -10,12 +10,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { DashboardNav } from "../../components/Dashboard/DashboardNav";
 
-// Update Buffet interface to use string id (MongoDB ObjectId)
 interface Buffet {
-  id: string; // Changed from number to string to match MongoDB _id
+  id: string;
   name: string;
   email: string;
-  password: string; // Add password field for authentication
+  password: string;
   location: string;
   openingHours: string;
   image: string;
@@ -26,7 +25,7 @@ export const AdminDashboard = () => {
   const [username, setUsername] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [buffets, setBuffets] = useState<Buffet[]>([]); // Initialize as empty array
+  const [buffets, setBuffets] = useState<Buffet[]>([]);
   const [currentBuffet, setCurrentBuffet] = useState<Buffet | null>(null);
   const [newBuffet, setNewBuffet] = useState<Omit<Buffet, "id">>({
     name: "",
@@ -39,7 +38,6 @@ export const AdminDashboard = () => {
   });
   const navigate = useNavigate();
 
-  // Check authentication (unchanged)
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const url = "http://localhost:3000/api/dashboard";
@@ -57,7 +55,6 @@ export const AdminDashboard = () => {
       .catch(() => navigate("/"));
   }, [navigate]);
 
-  // Fetch buffets from MongoDB on component mount
   useEffect(() => {
     const fetchBuffets = async () => {
       const token = localStorage.getItem("accessToken");
@@ -80,7 +77,6 @@ export const AdminDashboard = () => {
     navigate("/");
   };
 
-  // Save new buffet to MongoDB
   const handleAddBuffet = async () => {
     const token = localStorage.getItem("accessToken");
     const url = "http://localhost:3000/api/buffets";
@@ -88,9 +84,9 @@ export const AdminDashboard = () => {
 
     try {
       const response = await axios.post(url, newBuffet, { headers });
-      const savedBuffet = response.data; // Includes the server-assigned id
-      console.log("Saved buffet:", savedBuffet); // Log the saved buffet
-      setBuffets([...buffets, savedBuffet]); // Add the saved buffet to state
+      const savedBuffet = response.data;
+      console.log("Saved buffet:", savedBuffet);
+      setBuffets([...buffets, savedBuffet]);
       setShowAddModal(false);
       setNewBuffet({
         name: "",
@@ -103,23 +99,21 @@ export const AdminDashboard = () => {
       });
     } catch (error) {
       console.error("Error saving buffet:", error);
-      // Optionally, show an error message to the user
     }
   };
 
-  // Update existing buffet
   const handleEditBuffet = async () => {
     if (!currentBuffet) return;
-    
+
     const token = localStorage.getItem("accessToken");
     const url = `http://localhost:3000/api/buffets/${currentBuffet.id}`;
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
       await axios.put(url, currentBuffet, { headers });
-      
-      // Update the buffet in the state
-      setBuffets(buffets.map(b => b.id === currentBuffet.id ? currentBuffet : b));
+      setBuffets(
+        buffets.map((b) => (b.id === currentBuffet.id ? currentBuffet : b))
+      );
       setShowEditModal(false);
       setCurrentBuffet(null);
     } catch (error) {
@@ -127,11 +121,10 @@ export const AdminDashboard = () => {
     }
   };
 
-  // Delete buffet
   const handleDeleteBuffet = async (id: string, event: React.MouseEvent) => {
-    event.preventDefault(); // Prevent navigation
-    event.stopPropagation(); // Stop event propagation
-    
+    event.preventDefault();
+    event.stopPropagation();
+
     if (window.confirm("Biztosan törölni szeretnéd ezt a büfét?")) {
       const token = localStorage.getItem("accessToken");
       const url = `http://localhost:3000/api/buffets/${id}`;
@@ -139,31 +132,27 @@ export const AdminDashboard = () => {
 
       try {
         await axios.delete(url, { headers });
-        // Remove the deleted buffet from state
-        setBuffets(buffets.filter(buffet => buffet.id !== id));
+        setBuffets(buffets.filter((buffet) => buffet.id !== id));
       } catch (error) {
         console.error("Error deleting buffet:", error);
       }
     }
   };
 
-  // Open edit modal with selected buffet data
   const handleOpenEditModal = (buffet: Buffet, event: React.MouseEvent) => {
-    event.preventDefault(); // Prevent navigation
-    event.stopPropagation(); // Stop event propagation
+    event.preventDefault();
+    event.stopPropagation();
     setCurrentBuffet({ ...buffet });
     setShowEditModal(true);
   };
 
   return (
     <div className="min-h-screen bg-[var(--admin-background)]">
-      {/* Navbar */}
       <DashboardNav username={username} handleLogout={handleLogout} />
 
-      {/* Add Buffet Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[var(--admin-surface)] rounded-lg p-6 w-full max-w-md animate-fade-in">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-[var(--admin-surface)] rounded-lg p-6 w-full max-w-md animate-fade-in shadow-2xl ">
             <h3 className="text-2xl font-bold mb-4 text-[var(--admin-primary-dark)]">
               Új Büfé
             </h3>
@@ -172,7 +161,7 @@ export const AdminDashboard = () => {
               <input
                 type="text"
                 placeholder="Név"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
                 value={newBuffet.name}
                 onChange={(e) =>
                   setNewBuffet({ ...newBuffet, name: e.target.value })
@@ -181,7 +170,7 @@ export const AdminDashboard = () => {
               <input
                 type="text"
                 placeholder="Helyszín"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
                 value={newBuffet.location}
                 onChange={(e) =>
                   setNewBuffet({ ...newBuffet, location: e.target.value })
@@ -190,7 +179,7 @@ export const AdminDashboard = () => {
               <input
                 type="text"
                 placeholder="Nyitvatartás"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
                 value={newBuffet.openingHours}
                 onChange={(e) =>
                   setNewBuffet({ ...newBuffet, openingHours: e.target.value })
@@ -200,17 +189,16 @@ export const AdminDashboard = () => {
                 type="text"
                 placeholder="Email cím"
                 value={newBuffet.email}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
                 onChange={(e) =>
                   setNewBuffet({ ...newBuffet, email: e.target.value })
-
                 }
               />
               <input
                 type="password"
                 placeholder="Jelszó"
                 value={newBuffet.password}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
                 onChange={(e) =>
                   setNewBuffet({ ...newBuffet, password: e.target.value })
                 }
@@ -220,13 +208,13 @@ export const AdminDashboard = () => {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-[var(--admin-text)] hover:text-[var(--admin-primary-dark)]"
+                className="px-4 py-2 text-[var(--admin-text)] hover:text-[var(--admin-primary-dark)] cursor-pointer"
               >
                 Mégse
               </button>
               <button
                 onClick={handleAddBuffet}
-                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-primary-dark)]"
+                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-primary-dark)] cursor-pointer"
               >
                 Mentés
               </button>
@@ -235,19 +223,17 @@ export const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Edit Buffet Modal */}
       {showEditModal && currentBuffet && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[var(--admin-surface)] rounded-lg p-6 w-full max-w-md animate-fade-in">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-[var(--admin-surface)] rounded-lg p-6 w-full max-w-md animate-fade-in shadow-2xl ">
             <h3 className="text-2xl font-bold mb-4 text-[var(--admin-primary-dark)]">
               Büfé Szerkesztése
             </h3>
-
             <div className="space-y-4">
               <input
                 type="text"
                 placeholder="Név"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
                 value={currentBuffet.name}
                 onChange={(e) =>
                   setCurrentBuffet({ ...currentBuffet, name: e.target.value })
@@ -256,25 +242,31 @@ export const AdminDashboard = () => {
               <input
                 type="text"
                 placeholder="Helyszín"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
                 value={currentBuffet.location}
                 onChange={(e) =>
-                  setCurrentBuffet({ ...currentBuffet, location: e.target.value })
+                  setCurrentBuffet({
+                    ...currentBuffet,
+                    location: e.target.value,
+                  })
                 }
               />
               <input
                 type="text"
                 placeholder="Nyitvatartás"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
                 value={currentBuffet.openingHours}
                 onChange={(e) =>
-                  setCurrentBuffet({ ...currentBuffet, openingHours: e.target.value })
+                  setCurrentBuffet({
+                    ...currentBuffet,
+                    openingHours: e.target.value,
+                  })
                 }
               />
               <input
                 type="text"
                 placeholder="Címkék (vesszővel elválasztva)"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded outline-none border-[#e5e5e5] hover:border-[#a9a9a9] focus:border-[#a9a9a9] transition-all duration-300"
                 value={currentBuffet.tags.join(", ")}
                 onChange={(e) =>
                   setCurrentBuffet({
@@ -287,17 +279,16 @@ export const AdminDashboard = () => {
                 }
               />
             </div>
-
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 text-[var(--admin-text)] hover:text-[var(--admin-primary-dark)]"
+                className="px-4 py-2 text-[var(--admin-text)] hover:text-[var(--admin-primary-dark)] cursor-pointer"
               >
                 Mégse
               </button>
               <button
                 onClick={handleEditBuffet}
-                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-primary-dark)]"
+                className="px-4 py-2 bg-[var(--admin-primary)] text-white rounded hover:bg-[var(--admin-primary-dark)] cursor-pointer"
               >
                 Mentés
               </button>
@@ -306,7 +297,6 @@ export const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Main Content */}
       <main className="p-4 md:p-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-[var(--admin-text)]">Büfék</h2>
@@ -356,20 +346,18 @@ export const AdminDashboard = () => {
                   </div>
                 </div>
               </Link>
-              {/* Todo: Email validation*/}
 
-              {/* Action buttons */}
               <div className="absolute top-2 right-2 flex gap-2">
                 <button
                   onClick={(e) => handleOpenEditModal(buffet, e)}
-                  className="bg-[var(--admin-primary-light)] text-[var(--admin-primary)] p-2 rounded-full hover:bg-[var(--admin-primary)] hover:text-white transition-colors"
+                  className="bg-[var(--admin-primary-light)] text-[var(--admin-primary)] p-2 rounded-full hover:bg-[var(--admin-primary)] hover:text-white transition-colors cursor-pointer"
                   title="Szerkesztés"
                 >
                   <FontAwesomeIcon icon={faPencilAlt} />
                 </button>
                 <button
                   onClick={(e) => handleDeleteBuffet(buffet.id, e)}
-                  className="bg-red-100 text-red-500 p-2 rounded-full hover:bg-red-500 hover:text-white transition-colors"
+                  className="bg-red-100 text-red-500 p-2 rounded-full hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
                   title="Törlés"
                 >
                   <FontAwesomeIcon icon={faTrash} />
