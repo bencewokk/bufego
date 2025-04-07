@@ -58,7 +58,7 @@ export const AdminDashboard = () => {
   useEffect(() => {
     const fetchBuffets = async () => {
       const token = localStorage.getItem("accessToken");
-      const url = "http://localhost:3000/api/buffets";
+      const url = "http://localhost:3000/api/buffets/get";
       const headers = { Authorization: `Bearer ${token}` };
 
       try {
@@ -78,66 +78,16 @@ export const AdminDashboard = () => {
   };
 
   const handleAddBuffet = async () => {
-    const token = localStorage.getItem("accessToken");
-    const url = "http://localhost:3000/api/buffets";
-    const headers = { Authorization: `Bearer ${token}` };
-
-    try {
-      const response = await axios.post(url, newBuffet, { headers });
-      const savedBuffet = response.data;
-      console.log("Saved buffet:", savedBuffet);
-      setBuffets([...buffets, savedBuffet]);
-      setShowAddModal(false);
-      setNewBuffet({
-        name: "",
-        location: "",
-        openingHours: "",
-        email: "",
-        password: "",
-        image: "/src/buffet1.jpg",
-        tags: [],
-      });
-    } catch (error) {
-      console.error("Error saving buffet:", error);
-    }
-  };
+    
+  }
 
   const handleEditBuffet = async () => {
-    if (!currentBuffet) return;
-
-    const token = localStorage.getItem("accessToken");
-    const url = `http://localhost:3000/api/buffets/${currentBuffet.id}`;
-    const headers = { Authorization: `Bearer ${token}` };
-
-    try {
-      await axios.put(url, currentBuffet, { headers });
-      setBuffets(
-        buffets.map((b) => (b.id === currentBuffet.id ? currentBuffet : b))
-      );
-      setShowEditModal(false);
-      setCurrentBuffet(null);
-    } catch (error) {
-      console.error("Error updating buffet:", error);
-    }
-  };
+    
+  }
 
   const handleDeleteBuffet = async (id: string, event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (window.confirm("Biztosan törölni szeretnéd ezt a büfét?")) {
-      const token = localStorage.getItem("accessToken");
-      const url = `http://localhost:3000/api/buffets/${id}`;
-      const headers = { Authorization: `Bearer ${token}` };
-
-      try {
-        await axios.delete(url, { headers });
-        setBuffets(buffets.filter((buffet) => buffet.id !== id));
-      } catch (error) {
-        console.error("Error deleting buffet:", error);
-      }
-    }
-  };
+    
+  }
 
   const handleOpenEditModal = (buffet: Buffet, event: React.MouseEvent) => {
     event.preventDefault();
