@@ -199,6 +199,7 @@ export const AdminDashboard = () => {
               <input
                 type="text"
                 placeholder="Email cím"
+                value={newBuffet.email}
                 className="w-full p-2 border rounded"
                 onChange={(e) =>
                   setNewBuffet({ ...newBuffet, email: e.target.value })
@@ -206,8 +207,9 @@ export const AdminDashboard = () => {
                 }
               />
               <input
-                type="text"
+                type="password"
                 placeholder="Jelszó"
+                value={newBuffet.password}
                 className="w-full p-2 border rounded"
                 onChange={(e) =>
                   setNewBuffet({ ...newBuffet, password: e.target.value })
