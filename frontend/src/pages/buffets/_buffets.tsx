@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '../../components/landing/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faMapMarkerAlt, faStar, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faMapMarkerAlt, faClock } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 
 // Define Buffet interface consistent with MongoDB structure
@@ -11,7 +11,6 @@ interface Buffet {
   id: string; // MongoDB ObjectId as string
   name: string;
   location: string;
-  rating: number;
   openingHours: string;
   image: string;
   tags: string[];
@@ -118,10 +117,6 @@ export const BuffetListPage = () => {
                 <div className="p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h2 className="text-xl font-semibold text-[var(--text)]">{buffet.name}</h2>
-                    <div className="flex items-center bg-yellow-100 px-2 py-1 rounded">
-                      <FontAwesomeIcon icon={faStar} className="text-yellow-500 mr-1" />
-                      <span className="font-medium">{buffet.rating}</span>
-                    </div>
                   </div>
                   
                   <div className="flex items-center text-gray-600 mb-3">

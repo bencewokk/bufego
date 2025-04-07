@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faClock,
   faMapMarkerAlt,
-  faStar,
   faPencilAlt,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
@@ -16,7 +15,6 @@ interface Buffet {
   id: string; // Changed from number to string to match MongoDB _id
   name: string;
   location: string;
-  rating: number;
   openingHours: string;
   image: string;
   tags: string[];
@@ -31,7 +29,6 @@ export const AdminDashboard = () => {
   const [newBuffet, setNewBuffet] = useState<Omit<Buffet, "id">>({
     name: "",
     location: "",
-    rating: 0,
     openingHours: "",
     image: "/src/buffet1.jpg",
     tags: [],
@@ -93,7 +90,6 @@ export const AdminDashboard = () => {
       setNewBuffet({
         name: "",
         location: "",
-        rating: 0,
         openingHours: "",
         image: "/src/buffet1.jpg",
         tags: [],
@@ -185,15 +181,6 @@ export const AdminDashboard = () => {
                 }
               />
               <input
-                type="number"
-                placeholder="Értékelés"
-                className="w-full p-2 border rounded"
-                value={newBuffet.rating}
-                onChange={(e) =>
-                  setNewBuffet({ ...newBuffet, rating: Number(e.target.value) })
-                }
-              />
-              <input
                 type="text"
                 placeholder="Nyitvatartás"
                 className="w-full p-2 border rounded"
@@ -261,15 +248,6 @@ export const AdminDashboard = () => {
                 value={currentBuffet.location}
                 onChange={(e) =>
                   setCurrentBuffet({ ...currentBuffet, location: e.target.value })
-                }
-              />
-              <input
-                type="number"
-                placeholder="Értékelés"
-                className="w-full p-2 border rounded"
-                value={currentBuffet.rating}
-                onChange={(e) =>
-                  setCurrentBuffet({ ...currentBuffet, rating: Number(e.target.value) })
                 }
               />
               <input
@@ -347,13 +325,6 @@ export const AdminDashboard = () => {
                     <h2 className="text-xl font-semibold text-[var(--admin-text)]">
                       {buffet.name}
                     </h2>
-                    <div className="flex items-center bg-[var(--admin-primary-light)] px-2 py-1 rounded">
-                      <FontAwesomeIcon
-                        icon={faStar}
-                        className="text-[var(--admin-primary)] mr-1"
-                      />
-                      <span className="font-medium">{buffet.rating}</span>
-                    </div>
                   </div>
 
                   <div className="flex items-center text-[var(--admin-text)] mb-3">
