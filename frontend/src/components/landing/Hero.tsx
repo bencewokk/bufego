@@ -13,7 +13,7 @@ export const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <a 
-                href="/register" 
+                href="/signup" 
                 className="bg-white text-[var(--primary)] px-6 py-3 rounded-full 
                           font-medium text-center hover:bg-gray-100 transition-colors"
               >
