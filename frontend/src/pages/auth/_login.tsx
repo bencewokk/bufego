@@ -2,7 +2,6 @@ import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import logoImage from '../../assets/bufego.png';
-import { FloatingBlob } from "../../components/design/Blob";
 import { GeometricBackground } from "../../components/design/GeometricBackground";
 
 export const LoginPage = () => {
