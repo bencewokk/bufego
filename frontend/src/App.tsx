@@ -8,6 +8,7 @@ import { BuffetLoginPage } from "./pages/auth/_buffetLogin";
 import { AdminDashboard } from "./pages/admin/_dashboard";
 import { BuffetDashboard } from "./pages/_buffetDashboard";
 import { BuffetDetails } from "./pages/buffets/_details";
+import { BuffetTouch } from "./pages/_buffetTouch"; 
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/buffet-dashboard" element={<BuffetDashboard />} />
         <Route path="/buffet/:id" element={<BuffetDetails />} />
+        <Route path="/buffet-dashboard/touch" element={<BuffetTouch />} />
       </Routes>
     </BrowserRouter>
   );

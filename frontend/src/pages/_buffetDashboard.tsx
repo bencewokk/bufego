@@ -201,6 +201,14 @@ export const BuffetDashboard = () => {
           </div>
         </div>
         
+        {/* Added Érintős nézet button */}
+        <button
+          onClick={() => navigate("/buffet-dashboard/touch")}
+          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+        >
+          Érintős nézet
+        </button>
+        
         {/* Inventory management */}
         <div className="bg-white p-4 rounded shadow mb-6">
           <div className="flex justify-between items-center mb-4">
