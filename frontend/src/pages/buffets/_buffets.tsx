@@ -22,14 +22,11 @@ export const BuffetListPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Fetch buffets from MongoDB on component mount
   useEffect(() => {
     const fetchBuffets = async () => {
       try {
-        // Get the token (if you're using token-based auth for public routes too)
         const token = localStorage.getItem('accessToken');
         
-        // Option 1: With authentication (like your admin page)
         if (token) {
           const response = await axios.get('http://localhost:3000/api/buffets', {
             headers: { Authorization: `Bearer ${token}` }
