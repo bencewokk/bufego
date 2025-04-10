@@ -25,7 +25,11 @@ export const useBuffets = () => {
 
     try {
       const response = await axios.get(url, { headers });
-      setBuffets(response.data);
+      const mappedBuffets = response.data.map((buffet: { _id: any; }) => ({
+        ...buffet,
+        id: buffet._id 
+      }));
+      setBuffets(mappedBuffets);
       setError(null);
     } catch (err) {
       console.error("Error fetching buffets:", err);
@@ -42,7 +46,7 @@ export const useBuffets = () => {
 
     try {
       const response = await axios.post(url, newBuffet, { headers });
-      await fetchBuffets(); // Refresh the list
+      await fetchBuffets(); 
       return response.data;
     } catch (err) {
       console.error("Error adding buffet:", err);
@@ -57,13 +61,14 @@ export const useBuffets = () => {
 
     try {
       const response = await axios.put(url, buffet, { headers });
-      await fetchBuffets(); // Refresh the list
+      await fetchBuffets();
       return response.data;
     } catch (err) {
       console.error("Error updating buffet:", err);
       throw err;
     }
   };
+
 
   const deleteBuffet = async (id: string) => {
     const token = localStorage.getItem("accessToken");
