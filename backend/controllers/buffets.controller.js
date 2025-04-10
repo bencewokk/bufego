@@ -1,5 +1,7 @@
 import Buffet from "../models/buffet.model.js";
 import bcrypt from 'bcrypt';
+import jwt from "jsonwebtoken";
+
 
 const saltRounds = 10;
 
@@ -11,6 +13,40 @@ export const getBuffets = async (req, res) => {
 export const getBuffetById = async (req, res) => {
   const buffet = await Buffet.findById(req.params.id);
   res.json(buffet);
+};
+
+
+export const buffetLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const buffet = await Buffet.findOne({ email: email.toLowerCase() });
+    if (!buffet) {
+      return res
+        .status(404)
+        .json({ message: "Helytelen email vagy jelszó" });
+    }
+
+    const isMatch = await bcrypt.compare(password, buffet.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ message: "Helytelen email vagy jelszó" });
+    }
+
+    const token = jwt.sign(
+      { id: buffet._id, email: buffet.email, role: "buffet" },
+      process.env.JWT_SECRET,
+      { expiresIn: "30m" }
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Sikeres buffet bejelentkezés", buffet, token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Szerver hiba: " + error.message });
+  }
 };
 
 export const addBuffet = async (req, res) => {

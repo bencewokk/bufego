@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { connect } from "./database/connect.js";
 import authRoutes from "./routes/auth.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
-import buffetRoutes from "./routes/buffets.routes.js"; 
+import buffetRoutes from "./routes/buffets.routes.js";
 
 dotenv.config();
 
@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/buffets", buffetRoutes); 
+app.use("/api/buffets", buffetRoutes);
 
 app.listen(PORT, () => {
   console.log(`A szerver fut a ${PORT} porton`);
