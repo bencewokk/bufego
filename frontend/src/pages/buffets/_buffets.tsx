@@ -27,18 +27,21 @@ export const BuffetListPage = () => {
       try {
         const token = localStorage.getItem('accessToken');
         
+        let response;
         if (token) {
-          const response = await axios.get('http://localhost:3000/api/buffets', {
+          response = await axios.get('http://localhost:3000/api/buffets/get', {
             headers: { Authorization: `Bearer ${token}` }
           });
-          setBuffets(response.data);
-        } 
-        // Option 2: Without authentication (if your API allows public access)
-        else {
-          const response = await axios.get('http://localhost:3000/api/buffets/public');
-          setBuffets(response.data);
+        } else {
+          response = await axios.get('http://localhost:3000/api/buffets/public');
         }
-        
+
+        // Map _id to id for each buffet document
+        const mappedBuffets = response.data.map((buffet: any) => ({
+          ...buffet,
+          id: buffet._id,
+        }));
+        setBuffets(mappedBuffets);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching buffets:', err);
@@ -93,7 +96,7 @@ export const BuffetListPage = () => {
             </button>
           </div>
         ) : filteredBuffets.length === 0 ? (
-          <div className="flex justify-center items-center h-64">sa
+          <div className="flex justify-center items-center h-64">
             <div className="text-lg text-gray-600">Nincs találat</div>
           </div>
         ) : (
