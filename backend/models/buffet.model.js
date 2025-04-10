@@ -8,6 +8,13 @@ const buffetSchema = new mongoose.Schema({
   tags: { type: [String], default: [] },
   email: { type: String, required: true },
   password: { type: String, required: true },
+  inventory: [
+    {
+      name: { type: String, required: true },
+      available: { type: Boolean, default: true },
+      category: { type: String, default: "Egyéb" } 
+    }
+  ]
 });
 
 export default mongoose.model("Buffet", buffetSchema);

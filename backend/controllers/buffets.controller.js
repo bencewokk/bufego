@@ -105,3 +105,94 @@ export const deleteBuffet = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+export const getBuffetInventory = async (req, res) => {
+  try {
+    const buffet = await Buffet.findById(req.params.id);
+    if (!buffet) {
+      return res.status(404).json({ message: "Buffet not found" });
+    }
+    res.json(buffet.inventory);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const updateBuffetInventory = async (req, res) => {
+  try {
+    const { inventory } = req.body;
+    const updatedBuffet = await Buffet.findByIdAndUpdate(
+      req.params.id,
+      { inventory },
+      { new: true }
+    );
+    
+    if (!updatedBuffet) {
+      return res.status(404).json({ message: "Buffet not found" });
+    }
+    
+    res.json(updatedBuffet);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const addInventoryItem = async (req, res) => {
+  try {
+    const { name, available, category } = req.body;
+    const buffet = await Buffet.findById(req.params.id);
+    
+    if (!buffet) {
+      return res.status(404).json({ message: "Buffet not found" });
+    }
+    
+    buffet.inventory.push({ name, available, category });
+    await buffet.save();
+    
+    res.status(201).json(buffet);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const removeInventoryItem = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const buffet = await Buffet.findById(req.params.id);
+    
+    if (!buffet) {
+      return res.status(404).json({ message: "Buffet not found" });
+    }
+    
+    buffet.inventory = buffet.inventory.filter(item => item._id.toString() !== itemId);
+    await buffet.save();
+    
+    res.json(buffet);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const toggleItemAvailability = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const buffet = await Buffet.findById(req.params.id);
+    
+    if (!buffet) {
+      return res.status(404).json({ message: "Buffet not found" });
+    }
+    
+    const itemIndex = buffet.inventory.findIndex(item => item._id.toString() === itemId);
+    if (itemIndex === -1) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+    
+    buffet.inventory[itemIndex].available = !buffet.inventory[itemIndex].available;
+    await buffet.save();
+    
+    res.json(buffet);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
