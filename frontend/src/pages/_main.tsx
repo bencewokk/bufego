@@ -11,12 +11,6 @@ export const MainPage = () => {
       <HowItWorks />
 
       
-      {/* You could add more sections here like:
-          - Popular Locations
-          - Testimonials
-          - FAQ
-          - Contact/Footer
-      */}
     </div>
   );
 };

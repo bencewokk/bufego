@@ -11,12 +11,10 @@ export const BuffetLoginPage = () => {
     password: "",
   });
 
-  // Update the state on change (note we now target "email" instead of "username")
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Submit the form to the buffet login endpoint
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -33,7 +31,6 @@ export const BuffetLoginPage = () => {
       success: (res) => {
         const token = res.data.token;
         localStorage.setItem("accessToken", token);
-        // Update redirect for buffet dashboard (for example /buffet-dashboard)
         window.location.href = "/buffet-dashboard";
         return <b>Sikeresen bejelentkeztél!</b>;
       },

@@ -115,3 +115,64 @@ export const register = async (req, res) => {
     res.status(500).json({ message: "Szerver hiba: " + error.message });
   }
 };
+
+
+import multer from 'multer';
+import path from 'path';
+
+// Configure storage for uploaded images
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/') // Make sure this directory exists
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
+  }
+})
+
+// File filter for image files only
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true)
+  } else {
+    cb(new Error('Only image files are allowed!'), false)
+  }
+}
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+})
+
+// Add this controller function
+export const uploadBuffetImage = async (req, res) => {
+  try {
+    const buffet = await Buffet.findById(req.params.id);
+    
+    if (!buffet) {
+      return res.status(404).json({ message: "Buffet not found" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
+
+    // Construct the image URL
+    const imageUrl = `/uploads/${req.file.filename}`;
+    
+    // Update buffet with new image URL
+    buffet.image = imageUrl;
+    await buffet.save();
+
+    res.status(200).json({
+      message: "Image uploaded successfully",
+      imageUrl: imageUrl
+    });
+    
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    res.status(500).json({ message: error.message });
+  }
+};

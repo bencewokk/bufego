@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "../components/landing/Navbar";
@@ -27,6 +27,11 @@ export const BuffetDashboard = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [newItem, setNewItem] = useState<InventoryItem>({ name: "", available: true, category: "Egyéb" });
   const [showAddForm, setShowAddForm] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,6 +48,9 @@ export const BuffetDashboard = () => {
         });
         // Assuming that the buffet information is provided in response.data.user
         setBuffet(response.data.user);
+        if (response.data.user && response.data.user.image) {
+          setImagePreview(response.data.user.image);
+        }
         
         // Fetch inventory if buffet data is available
         if (response.data.user && response.data.user.id) {
@@ -73,6 +81,82 @@ export const BuffetDashboard = () => {
       setInventory(response.data || []);
     } catch (error) {
       console.error("Error fetching inventory:", error);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      
+      // Validate file type
+      if (!file.type.match('image.*')) {
+        setUpdateMessage({text: "Please select an image file", type: 'error'});
+        return;
+      }
+      
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        setUpdateMessage({text: "Image must be smaller than 5MB", type: 'error'});
+        return;
+      }
+      
+      setUploadedImage(file);
+      
+      // Create a preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadImage = async () => {
+    if (!buffet || !uploadedImage) return;
+    
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      navigate("/");
+      return;
+    }
+    
+    setUploading(true);
+    try {
+      // Create form data for image upload
+      const formData = new FormData();
+      formData.append('image', uploadedImage);
+      
+      const response = await axios.post(
+        `http://localhost:3000/api/buffets/${buffet.id}/upload-image`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      
+      // Update buffet data with new image URL
+      if (response.data && response.data.imageUrl) {
+        setBuffet(prev => prev ? {...prev, image: response.data.imageUrl} : null);
+        setUpdateMessage({text: "Image uploaded successfully!", type: 'success'});
+        
+        // Clear the file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      setUpdateMessage({text: "Failed to upload image. Please try again.", type: 'error'});
+    } finally {
+      setUploading(false);
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setUpdateMessage(null);
+      }, 3000);
     }
   };
 
@@ -178,25 +262,88 @@ export const BuffetDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-4">Buffet Dashboard</h1>
         
-        {/* Buffet details */}
-        <div className="bg-white p-4 rounded shadow mb-6">
-          <h2 className="text-xl font-semibold mb-2">Buffet Details</h2>
-          <div className="space-y-2">
+        {/* Buffet details & Image upload */}
+        <div className="bg-white p-6 rounded-lg shadow mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <span className="font-semibold">Név: </span>{buffet.name}
+              <h2 className="text-xl font-semibold mb-4">Buffet Details</h2>
+              <div className="space-y-3">
+                <div>
+                  <span className="font-semibold">Név: </span>{buffet.name}
+                </div>
+                <div>
+                  <span className="font-semibold">Email: </span>{buffet.email}
+                </div>
+                <div>
+                  <span className="font-semibold">Helyszín: </span>{buffet.location}
+                </div>
+                <div>
+                  <span className="font-semibold">Nyitvatartás: </span>{buffet.openingHours}
+                </div>
+                <div>
+                  <span className="font-semibold">Címkék: </span>
+                  {buffet.tags && buffet.tags.length > 0 ? buffet.tags.join(", ") : "Nincsenek címkék"}
+                </div>
+              </div>
             </div>
+            
             <div>
-              <span className="font-semibold">Email: </span>{buffet.email}
-            </div>
-            <div>
-              <span className="font-semibold">Helyszín: </span>{buffet.location}
-            </div>
-            <div>
-              <span className="font-semibold">Nyitvatartás: </span>{buffet.openingHours}
-            </div>
-            <div>
-              <span className="font-semibold">Címkék: </span>
-              {buffet.tags && buffet.tags.length > 0 ? buffet.tags.join(", ") : "Nincsenek címkék"}
+              <h2 className="text-xl font-semibold mb-4">Buffet Image</h2>
+              <div className="flex flex-col items-center">
+                <div className="w-full h-64 mb-4 p-2 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                  {imagePreview ? (
+                    <img 
+                      src={imagePreview} 
+                      alt="Buffet preview" 
+                      className="max-w-full max-h-full object-contain rounded"
+                    />
+                  ) : (
+                    <div className="text-center p-4">
+                      <p className="text-gray-500">No image uploaded</p>
+                      <p className="text-sm text-gray-400">Upload an image to showcase your buffet</p>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="w-full flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                  <label className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-center cursor-pointer transition">
+                    Select Image
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      onChange={handleImageChange}
+                      accept="image/*"
+                      ref={fileInputRef}
+                    />
+                  </label>
+                  <button
+                    onClick={handleUploadImage}
+                    disabled={!uploadedImage || uploading}
+                    className={`px-4 py-2 rounded transition ${
+                      uploadedImage && !uploading 
+                        ? 'bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)]' 
+                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    {uploading ? 'Uploading...' : 'Upload Image'}
+                  </button>
+                </div>
+                
+                {updateMessage && (
+                  <div className={`mt-2 p-2 rounded text-sm ${
+                    updateMessage.type === 'success' 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-red-100 text-red-700'
+                  }`}>
+                    {updateMessage.text}
+                  </div>
+                )}
+                
+                <div className="mt-3 text-xs text-gray-500">
+                  <p>Accepted formats: JPG, PNG, GIF</p>
+                  <p>Maximum size: 5MB</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -230,7 +377,7 @@ export const BuffetDashboard = () => {
                   <input
                     type="text"
                     value={newItem.name}
-                    onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+                    onChange={(e) => setNewItem({...newItem, name: e                  .target.value})}
                     className="w-full p-2 border rounded"
                     placeholder="Pl. Sonkás szendvics"
                   />
