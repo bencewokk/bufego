@@ -1,4 +1,7 @@
 import Buffet from "../models/buffet.model.js";
+import bcrypt from 'bcrypt';
+
+const saltRounds = 10;
 
 export const getBuffets = async (req, res) => {
   const buffets = await Buffet.find();
@@ -22,7 +25,8 @@ export const addBuffet = async (req, res) => {
       return res.status(400).json({ message: "A megadott email címmel már rendelkezik egy büfé!" });
     }
 
-    const newBuffet = new Buffet({ name, location, openingHours, image, tags, email, password });
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const newBuffet = new Buffet({ name, location, openingHours, image, tags, email, password: hashedPassword });
     console.log("Attempting to save new buffet:", newBuffet);
     await newBuffet.save();
     console.log("Buffet saved successfully");
