@@ -2,7 +2,6 @@ import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import logoImage from "../../assets/bufego.png";
-import { FloatingBlob } from "../../components/design/Blob";
 import { GeometricBackground } from "../../components/design/GeometricBackground";
 
 export const BuffetLoginPage = () => {
@@ -11,12 +10,10 @@ export const BuffetLoginPage = () => {
     password: "",
   });
 
-  // Update the state on change (note we now target "email" instead of "username")
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Submit the form to the buffet login endpoint
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -33,7 +30,6 @@ export const BuffetLoginPage = () => {
       success: (res) => {
         const token = res.data.token;
         localStorage.setItem("accessToken", token);
-        // Update redirect for buffet dashboard (for example /buffet-dashboard)
         window.location.href = "/buffet-dashboard";
         return <b>Sikeresen bejelentkeztél!</b>;
       },
@@ -49,7 +45,6 @@ export const BuffetLoginPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] relative overflow-hidden">
       <GeometricBackground />
-      <FloatingBlob />
 
       <div className="absolute top-4 left-4">
         <a href="/" aria-label="Főoldal">

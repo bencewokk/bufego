@@ -1,7 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import { FloatingBlob } from "../../components/design/Blob";
 import logoImage from '../../assets/bufego.png';
 import { GeometricBackground } from "../../components/design/GeometricBackground";
 
@@ -49,7 +48,6 @@ export const RegisterPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] relative overflow-hidden">
       <GeometricBackground />
-      <FloatingBlob />
       
       <div className="absolute top-4 left-4">
         <a href="/" aria-label="Főoldal">

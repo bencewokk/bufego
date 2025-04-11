@@ -9,12 +9,14 @@ import { AdminDashboard } from "./pages/admin/_dashboard";
 import { BuffetDashboard } from "./pages/_buffetDashboard";
 import { BuffetDetails } from "./pages/buffets/_details";
 import { BuffetTouch } from "./pages/_buffetTouch"; 
+import { About } from "./components/landing/About";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainPage />} />
+        <Route path="/about" element={<About />} />
         <Route path="/buffets" element={<BuffetListPage />} />
         <Route path="/signup" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />

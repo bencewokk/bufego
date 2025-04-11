@@ -2,7 +2,6 @@ import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import logoImage from '../../assets/bufego.png';
-import { FloatingBlob } from "../../components/design/Blob";
 import { GeometricBackground } from "../../components/design/GeometricBackground";
 
 export const LoginPage = () => {
@@ -44,7 +43,6 @@ export const LoginPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] relative overflow-hidden">
       <GeometricBackground />
-      <FloatingBlob />
       
       <div className="absolute top-4 left-4">
         <a href="/" aria-label="Főoldal">
