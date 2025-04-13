@@ -14,35 +14,10 @@ import {
   faTimes,
   faCalendarAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import { InventoryItem, Buffet } from "../../types";
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
 
-interface InventoryItem {
-  name: string;
-  available: boolean;
-  category: string;
-}
 
-interface Buffet {
-  id: string;
-  name: string;
-  location: string;
-  openingHours: string;
-  dailyHours?: {
-    monday: string;
-    tuesday: string;
-    wednesday: string;
-    thursday: string;
-    friday: string;
-    saturday: string;
-    sunday: string;
-  };
-  image: string;
-  tags: string[];
-  email?: string;
-  password?: string;
-  __v?: number;
-  inventory?: InventoryItem[];
-}
 
 export const BuffetDetails = () => {
   const { id } = useParams<{ id: string }>();

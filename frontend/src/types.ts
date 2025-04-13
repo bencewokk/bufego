@@ -12,13 +12,23 @@ export interface InventoryItem {
 export interface Buffet {
   id: string;
   name: string;
-  email: string;
   location: string;
   openingHours: string;
+  dailyHours?: {
+    monday: string;
+    tuesday: string;
+    wednesday: string;
+    thursday: string;
+    friday: string;
+    saturday: string;
+    sunday: string;
+  };
   image: string;
-  tags?: string[];
-  currentCapacity: number;
-  maxCapacity: number;
+  tags: string[];
+  email?: string;
+  password?: string;
+  __v?: number;
+  inventory?: InventoryItem[];
 }
 
 export interface Order {
@@ -29,3 +39,6 @@ export interface Order {
   pickupCode: string;
   pickupTime: Date;
 }
+
+
+
