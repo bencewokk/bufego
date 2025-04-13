@@ -14,17 +14,12 @@ import {
   faTimes,
   faCalendarAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { faShoppingCart, faPlus, faMinus, faExclamationCircle, faCalendarCheck } from "@fortawesome/free-solid-svg-icons";
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
 
 interface InventoryItem {
   name: string;
   available: boolean;
   category: string;
-}
-
-interface OrderTrackerProps {
-  buffetId: string;
 }
 
 interface Buffet {
@@ -49,22 +44,6 @@ interface Buffet {
   inventory?: InventoryItem[];
 }
 
-
-// ...existing interface declarations...
-
-interface OrderItem {
-  name: string;
-  quantity: number;
-}
-
-interface OrderModalProps {
-  buffet: Buffet;
-  inventory: InventoryItem[];
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-
 export const BuffetDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [buffet, setBuffet] = useState<Buffet | null>(null);
@@ -72,8 +51,6 @@ export const BuffetDetails = () => {
   const [error, setError] = useState("");
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
 
   useEffect(() => {
@@ -288,47 +265,6 @@ export const BuffetDetails = () => {
                   </div>
                 </div>
               )}
-
-              {/* New Order Online section */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-                <div className="md:col-span-2">
-                  <div className="flex items-center mb-6">
-                    <div className="p-3 rounded-lg mr-4" style={{ backgroundColor: "var(--primary)" }}>
-                      <FontAwesomeIcon icon={faShoppingCart} className="text-white text-xl" />
-                    </div>
-                    <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
-                      Order Online
-                    </h2>
-                  </div>
-                  <p className="text-gray-700 mb-4">
-                    Order your favorite items from {buffet.name} in advance and skip the line!
-                    We'll have your food ready for pickup at your chosen time.
-                  </p>
-                  <button
-                    onClick={() => setIsOrderModalOpen(true)}
-                    className="px-6 py-3 rounded-lg shadow-md text-white font-medium flex items-center transition-colors hover:opacity-90"
-                    style={{ backgroundColor: "var(--primary)" }}
-                  >
-                    <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
-                    Start Your Order
-                  </button>
-                </div>
-                
-                <div>
-                  <OrderTracker buffetId={buffet.id} />
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={() => setIsOrderModalOpen(true)}
-                  className="px-6 py-3 rounded-lg shadow-md text-white font-medium flex items-center transition-colors hover:opacity-90"
-                  style={{ backgroundColor: "var(--primary)" }}
-                >
-                  <FontAwesomeIcon icon={faShoppingCart} className="mr-2" />
-                  Place an Order
-                </button>
-              </div>
             </div>
           </div>
 
@@ -398,14 +334,6 @@ export const BuffetDetails = () => {
           )}
         </div>
       </div>
-      {buffet && (
-        <OrderModal
-          buffet={buffet}
-          inventory={buffet.inventory || []}
-          isOpen={isOrderModalOpen}
-          onClose={() => setIsOrderModalOpen(false)}
-        />
-      )}
       <style>{`
         .link-color {
           color: var(--primary);
@@ -427,347 +355,6 @@ export const BuffetDetails = () => {
           color: var(--primary-dark);
         }
       `}</style>
-    </div>
-  );
-};
-
-// ...existing code...
-
-const OrderModal = ({ buffet, inventory, isOpen, onClose }: OrderModalProps) => {
-  const [selectedItems, setSelectedItems] = useState<OrderItem[]>([]);
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [pickupTime, setPickupTime] = useState(15); // Default 15 minutes
-  const [loading, setLoading] = useState(false);
-  const [orderComplete, setOrderComplete] = useState(false);
-  const [orderCode, setOrderCode] = useState("");
-  const [error, setError] = useState("");
-
-  // Group items by category
-  const itemsByCategory = inventory.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
-    }
-    acc[item.category].push(item);
-    return acc;
-  }, {} as Record<string, InventoryItem[]>);
-
-  const updateItemQuantity = (name: string, delta: number) => {
-    setSelectedItems((prev) => {
-      const existingItemIndex = prev.findIndex((item) => item.name === name);
-      
-      if (existingItemIndex >= 0) {
-        const newQuantity = prev[existingItemIndex].quantity + delta;
-        if (newQuantity <= 0) {
-          return prev.filter((_, index) => index !== existingItemIndex);
-        }
-        
-        const newItems = [...prev];
-        newItems[existingItemIndex] = { ...newItems[existingItemIndex], quantity: newQuantity };
-        return newItems;
-      } else if (delta > 0) {
-        return [...prev, { name, quantity: delta }];
-      }
-      
-      return prev;
-    });
-  };
-
-  const getQuantity = (name: string) => {
-    const item = selectedItems.find((item) => item.name === name);
-    return item ? item.quantity : 0;
-  };
-
-  const getTotalItems = () => {
-    return selectedItems.reduce((sum, item) => sum + item.quantity, 0);
-  };
-
-  const handleSubmitOrder = async () => {
-    if (selectedItems.length === 0) {
-      setError("Please select at least one item");
-      return;
-    }
-  
-    setLoading(true);
-    setError("");
-  
-    try {
-      const expandedItems = selectedItems.flatMap(item => 
-        Array(item.quantity).fill(item.name)
-      );
-  
-      const response = await axios.post("http://localhost:3000/api/orders", {
-        buffetId: buffet.id,
-        items: expandedItems,
-        customerName: customerName || "Guest",
-        customerPhone: customerPhone || undefined,
-        pickupTimeMinutes: pickupTime
-      });
-  
-      if (response.data.success) {
-        setOrderCode(response.data.pickupCode);
-        setOrderComplete(true);
-      } else {
-        setError(response.data.error || "Failed to place order");
-      }
-    } catch (err: any) {
-      console.error("Error creating order:", err);
-      const errorMessage = err?.response?.data?.error || 
-                          err?.message || 
-                          "Failed to place your order. Please try again.";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const resetForm = () => {
-    setSelectedItems([]);
-    setCustomerName("");
-    setCustomerPhone("");
-    setPickupTime(15);
-    setOrderComplete(false);
-    setOrderCode("");
-    setError("");
-  };
-
-  const handleClose = () => {
-    resetForm();
-    onClose();
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-2xl font-bold" style={{ color: "var(--text)" }}>
-            {orderComplete ? "Order Confirmed" : "Place Order"}
-          </h2>
-          <button 
-            onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
-          >
-            &times;
-          </button>
-        </div>
-
-        <div className="overflow-y-auto p-6 flex-grow">
-          {orderComplete ? (
-            <div className="text-center py-10">
-              <div className="rounded-full bg-green-100 h-20 w-20 flex items-center justify-center mx-auto mb-4">
-                <FontAwesomeIcon icon={faCheck} className="text-green-600 text-3xl" />
-              </div>
-              <h3 className="text-2xl font-bold mb-2" style={{ color: "var(--text)" }}>
-                Your order has been placed!
-              </h3>
-              <p className="text-xl mb-6 text-gray-700">
-                Your pickup code is: <span className="font-bold text-2xl" style={{ color: "var(--primary)" }}>{orderCode}</span>
-              </p>
-              <p className="text-gray-600 mb-8">
-                Please check the screen at the buffet for your order status.
-                Your order will be ready for pickup in approximately {pickupTime} minutes.
-              </p>
-              <button
-                onClick={handleClose}
-                className="px-8 py-3 rounded-lg shadow-md text-white font-medium transition-colors"
-                style={{ backgroundColor: "var(--primary)" }}
-              >
-                Done
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold mb-4" style={{ color: "var(--text)" }}>
-                  Available Items
-                </h3>
-                
-                {Object.entries(itemsByCategory).map(([category, items]) => (
-                  <div key={category} className="mb-6">
-                    <h4 className="font-medium text-lg mb-3" style={{ color: "var(--primary-dark)" }}>
-                      {category}
-                    </h4>
-                    <div className="space-y-3">
-                      {items.filter(item => item.available).map((item) => (
-                        <div 
-                          key={item.name} 
-                          className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50"
-                        >
-                          <span className="font-medium" style={{ color: "var(--text)" }}>{item.name}</span>
-                          
-                          <div className="flex items-center">
-                            <button
-                              onClick={() => updateItemQuantity(item.name, -1)}
-                              disabled={getQuantity(item.name) === 0}
-                              className="w-8 h-8 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              style={{ 
-                                backgroundColor: getQuantity(item.name) > 0 ? "var(--primary-light)" : "var(--secondary)" 
-                              }}
-                            >
-                              <FontAwesomeIcon icon={faMinus} style={{ color: "var(--primary-dark)" }} />
-                            </button>
-                            
-                            <span className="w-10 text-center font-semibold" style={{ color: "var(--text)" }}>
-                              {getQuantity(item.name)}
-                            </span>
-                            
-                            <button
-                              onClick={() => updateItemQuantity(item.name, 1)}
-                              className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                              style={{ backgroundColor: "var(--primary-light)" }}
-                            >
-                              <FontAwesomeIcon icon={faPlus} style={{ color: "var(--primary-dark)" }} />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                      
-                      {items.filter(item => item.available).length === 0 && (
-                        <p className="text-gray-500 italic">No available items in this category</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                
-                {Object.keys(itemsByCategory).length === 0 && (
-                  <p className="text-gray-500 italic">No items available for order</p>
-                )}
-              </div>
-              
-              <div className="border-t border-gray-200 pt-6 space-y-4">
-                <h3 className="text-xl font-semibold mb-4" style={{ color: "var(--text)" }}>
-                  Your Details
-                </h3>
-                
-                <div>
-                  <label className="block text-gray-700 mb-1">Name</label>
-                  <input
-                    type="text"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Your Name"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-gray-700 mb-1">Phone (optional)</label>
-                  <input
-                    type="tel"
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    placeholder="Your Phone Number"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-gray-700 mb-1">Pickup Time</label>
-                  <select
-                    value={pickupTime}
-                    onChange={(e) => setPickupTime(parseInt(e.target.value))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value={15}>15 minutes</option>
-                    <option value={30}>30 minutes</option>
-                    <option value={45}>45 minutes</option>
-                    <option value={60}>1 hour</option>
-                  </select>
-                </div>
-                
-                {error && (
-                  <div className="p-3 bg-red-100 border border-red-200 rounded-lg text-red-700 flex items-center">
-                    <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
-                    {error}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-
-        {!orderComplete && (
-          <div className="border-t border-gray-200 p-6 flex justify-between items-center bg-gray-50">
-            <div>
-              <p className="text-gray-600">
-                Total Items: <span className="font-bold">{getTotalItems()}</span>
-              </p>
-            </div>
-            <button
-              disabled={loading || getTotalItems() === 0}
-              onClick={handleSubmitOrder}
-              className="px-8 py-3 rounded-lg shadow-md text-white font-medium flex items-center transition-colors disabled:opacity-50"
-              style={{ backgroundColor: "var(--primary)" }}
-            >
-              {loading ? (
-                <span className="flex items-center">
-                  <div className="w-5 h-5 border-2 rounded-full border-white border-t-transparent animate-spin mr-2"></div>
-                  Processing...
-                </span>
-              ) : (
-                <span className="flex items-center">
-                  <FontAwesomeIcon icon={faCalendarCheck} className="mr-2" />
-                  Place Order
-                </span>
-              )}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-
-// Add this component implementation before the MapComponent
-const OrderTracker = ({ buffetId }: OrderTrackerProps) => {
-  const [orderStatus, setOrderStatus] = useState<string>("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchOrderStatus = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/api/orders/status/${buffetId}`
-        );
-        setOrderStatus(response.data.status || "No active orders");
-      } catch (err) {
-        setError("Failed to load order status");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrderStatus();
-  }, [buffetId]);
-
-  return (
-    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-      <div className="flex items-center mb-3">
-        <FontAwesomeIcon 
-          icon={faBoxOpen} 
-          className="text-blue-600 mr-2" 
-        />
-        <h3 className="font-semibold">Your Order Status</h3>
-      </div>
-      {loading ? (
-        <div className="text-sm text-gray-600">Loading status...</div>
-      ) : error ? (
-        <div className="text-sm text-red-600">{error}</div>
-      ) : (
-        <div className="text-sm text-gray-700">
-          {orderStatus}
-          <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
-            <div 
-              className="bg-blue-600 h-1.5 rounded-full transition-all" 
-              style={{ width: orderStatus === "Ready for pickup" ? '100%' : '50%' }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
