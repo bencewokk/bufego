@@ -8,7 +8,7 @@ import { BuffetLoginPage } from "./pages/auth/_buffetLogin";
 import { AdminDashboard } from "./pages/admin/_dashboard";
 import { BuffetDashboard } from "./pages/buffetDashboard/_buffetDashboard";
 import { BuffetDetails } from "./pages/buffets/_details";
-import { BuffetTouch } from "./pages/buffetDashboard/_buffetTouch"; 
+import BuffetTouch from "./pages/buffetDashboard/touch/_buffetTouch"; 
 import { About } from "./components/landing/About";
 
 function App() {
