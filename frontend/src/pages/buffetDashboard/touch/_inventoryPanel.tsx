@@ -2,24 +2,36 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBox, faCheckCircle, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-import { InventoryItem } from "../../../types";
+import { InventoryItem, Order } from "../../../types";
 
 interface InventoryPanelProps {
   inventory: InventoryItem[];
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
-  itemPurchases: Record<string, number>;
+  orders: Order[]; // Add orders prop
   onToggleAvailability: (itemId: string) => void;
 }
 
-const InventoryPanel = ({ inventory, selectedCategory, setSelectedCategory, itemPurchases, onToggleAvailability }: InventoryPanelProps) => {
+const InventoryPanel = ({ inventory, selectedCategory, setSelectedCategory, orders = [], onToggleAvailability }: InventoryPanelProps) => {
+  // --- Calculate Preparing Orders ---
+  const preparingOrdersCount: Record<string, number> = orders
+    .filter(order => order.status === "preparing") // Only include "preparing" orders
+    .reduce((acc, order) => {
+      order.items.forEach(itemName => {
+        acc[itemName] = (acc[itemName] || 0) + 1;
+      });
+      return acc;
+    }, {} as Record<string, number>);
+
   // --- Filtering & Sorting ---
   const filteredInventory = inventory.filter((item) =>
     selectedCategory === "all" || item.category === selectedCategory
   );
+
   const getTopItems = () => [...inventory]
-    .sort((a, b) => (itemPurchases[b._id] || 0) - (itemPurchases[a._id] || 0))
+    .sort((a, b) => (preparingOrdersCount[b.name] || 0) - (preparingOrdersCount[a.name] || 0))
     .slice(0, 5);
+
   const topItemsInFilter = getTopItems().filter(item => filteredInventory.includes(item));
   const otherItemsInFilter = filteredInventory.filter(item => !topItemsInFilter.includes(item));
   const uniqueCategories = [...new Set(inventory.map((i) => i.category))];
@@ -69,7 +81,7 @@ const InventoryPanel = ({ inventory, selectedCategory, setSelectedCategory, item
                   {item.name}
                 </div>
                 <div className="text-lg text-gray-700">
-                  {item.stockLevel} in stock • {itemPurchases[item._id] || 0} ordered
+                  {preparingOrdersCount[item.name] || 0} being prepared
                 </div>
               </div>
             </div>
@@ -98,7 +110,7 @@ const InventoryPanel = ({ inventory, selectedCategory, setSelectedCategory, item
                   {item.name}
                 </div>
                 <div className="text-lg text-gray-700">
-                  {item.stockLevel} in stock
+                  {preparingOrdersCount[item.name] || 0} being prepared
                 </div>
               </div>
             </div>

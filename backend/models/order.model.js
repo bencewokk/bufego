@@ -1,0 +1,15 @@
+import mongoose from "mongoose";
+
+const orderSchema = new mongoose.Schema({
+    items: [{ type: String, required: true }],
+    status: {
+        type: String,
+        enum: ["pending", "preparing", "ready", "completed"],
+        default: "pending"
+    },
+    createdAt: { type: Date, default: Date.now },
+    pickupCode: { type: String, required: true },
+    pickupTime: { type: Date, required: true }
+});
+
+export default mongoose.model("Order", orderSchema);

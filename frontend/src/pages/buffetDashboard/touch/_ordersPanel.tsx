@@ -1,18 +1,69 @@
 // src/components/OrdersPanel.tsx
 
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faListAlt, faUtensils, faKey, faClock } from "@fortawesome/free-solid-svg-icons";
 import { Order } from "../../../types";
 
 interface OrdersPanelProps {
-  orders: Order[];
   currentTime: Date;
   updateOrderStatus: (orderId: string, newStatus: Order["status"]) => void;
   NEW_ORDER_THRESHOLD_MS: number;
 }
 
-const OrdersPanel = ({ orders, currentTime, updateOrderStatus, NEW_ORDER_THRESHOLD_MS }: OrdersPanelProps) => {
-  // --- Sorting Logic ---
+const OrdersPanel = ({
+  currentTime,
+  updateOrderStatus,
+  NEW_ORDER_THRESHOLD_MS,
+}: OrdersPanelProps) => {
+  // --- Use state to hold real orders fetched from the backend ---
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/orders");
+        // Convert pickupTime and createdAt from strings to Date objects,
+        // and assign _id to id so that each order has a unique identifier.
+        const convertedOrders: Order[] = response.data.map((order: any) => ({
+          ...order,
+          id: order._id, // Ensure a unique id is set from _id
+          pickupTime: new Date(order.pickupTime),
+          createdAt: new Date(order.createdAt),
+        }));
+        setOrders(convertedOrders);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+  
+    // Initial fetch
+    fetchOrders();
+  
+    // Optionally refresh the orders every 30 seconds:
+    const intervalId = setInterval(fetchOrders, 30000);
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  // --- This helper performs an optimistic update before calling the parent update ---
+  const handleOrderUpdate = async (orderId: string, newStatus: Order["status"]) => {
+    try {
+      await axios.put(`http://localhost:3000/api/orders/${orderId}/status`, { status: newStatus });
+      // Refetch orders to ensure the state is up-to-date
+      const response = await axios.get("http://localhost:3000/api/orders");
+      setOrders(response.data.map((order: any) => ({
+        ...order,
+        id: order._id,
+        pickupTime: new Date(order.pickupTime),
+        createdAt: new Date(order.createdAt),
+      })));
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
+  // --- Sorting logic remains unchanged ---
   const sortedOrders = [...orders].sort((a, b) => {
     // Completed orders go last
     const aCompleted = a.status === "completed";
@@ -34,8 +85,11 @@ const OrdersPanel = ({ orders, currentTime, updateOrderStatus, NEW_ORDER_THRESHO
     return a.createdAt.getTime() - b.createdAt.getTime();
   });
 
-  const formatRemainingTime = (order: Order): { text: string; color: string; urgent: boolean } => {
-    if (order.status === 'completed') {
+  // --- Helper to format the remaining time ---
+  const formatRemainingTime = (
+    order: Order
+  ): { text: string; color: string; urgent: boolean } => {
+    if (order.status === "completed") {
       return { text: "Picked Up", color: "text-gray-200", urgent: false };
     }
     const now = currentTime.getTime();
@@ -45,12 +99,12 @@ const OrdersPanel = ({ orders, currentTime, updateOrderStatus, NEW_ORDER_THRESHO
     }
     const remainingMinutes = Math.floor(remainingMs / 60000);
     const remainingSeconds = Math.floor((remainingMs % 60000) / 1000);
-    const timeString = `${String(remainingMinutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    const timeString = `${String(remainingMinutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
 
     let color = "text-gray-600";
-    if (order.status === 'pending') color = 'text-yellow-700';
-    else if (order.status === 'preparing') color = 'text-blue-700';
-    else if (order.status === 'ready') color = 'text-green-700';
+    if (order.status === "pending") color = "text-yellow-700";
+    else if (order.status === "preparing") color = "text-blue-700";
+    else if (order.status === "ready") color = "text-green-700";
 
     if (remainingMinutes < 1) {
       return { text: `Pickup in: ${timeString}`, color: "text-orange-600 font-semibold", urgent: true };
@@ -69,7 +123,12 @@ const OrdersPanel = ({ orders, currentTime, updateOrderStatus, NEW_ORDER_THRESHO
       </h2>
       <div className="flex-1 overflow-y-auto space-y-3 pr-2 pb-2">
         {sortedOrders.map((order) => {
-          const nextStatusMap = { pending: "preparing", preparing: "ready", ready: "completed", completed: "completed" } as const;
+          const nextStatusMap = {
+            pending: "preparing",
+            preparing: "ready",
+            ready: "completed",
+            completed: "completed",
+          } as const;
           let cardStyles = "";
           let itemTextColor = "text-gray-900";
           let secondaryTextColor = "text-gray-600";
@@ -109,13 +168,20 @@ const OrdersPanel = ({ orders, currentTime, updateOrderStatus, NEW_ORDER_THRESHO
 
           const { text: pickupTimeDisplay, color: pickupTimeColor, urgent: isUrgent } = formatRemainingTime(order);
           const orderAgeMs = currentTime.getTime() - order.createdAt.getTime();
-          const isNew = orderAgeMs < NEW_ORDER_THRESHOLD_MS && order.status !== 'completed';
+          const isNew = orderAgeMs < NEW_ORDER_THRESHOLD_MS && order.status !== "completed";
 
           return (
             <div
               key={order.id}
-              onClick={() => { if (order.status !== 'completed') updateOrderStatus(order.id, nextStatusMap[order.status]); }}
-              className={`relative p-4 rounded-xl flex items-start border ${order.status !== 'completed' ? "cursor-pointer active:scale-[0.98]" : ""} transition-all duration-150 ${cardStyles} ${isUrgent && order.status !== 'completed' ? "ring-2 ring-offset-1 ring-orange-500" : ""}`}
+              onClick={() =>
+                order.status !== "completed" &&
+                handleOrderUpdate(order.id, nextStatusMap[order.status])
+              }
+              className={`relative p-4 rounded-xl flex items-start border ${
+                order.status !== "completed" ? "cursor-pointer active:scale-[0.98]" : ""
+              } transition-all duration-150 ${cardStyles} ${
+                isUrgent && order.status !== "completed" ? "ring-2 ring-offset-1 ring-orange-500" : ""
+              }`}
             >
               {isNew && (
                 <span className="absolute top-2 right-2 bg-pink-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow z-10">

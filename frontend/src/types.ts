@@ -1,5 +1,6 @@
 // src/types/index.ts
 export interface InventoryItem {
+  uniqueId: any;
   _id: string;
   name: string;
   available: boolean;
