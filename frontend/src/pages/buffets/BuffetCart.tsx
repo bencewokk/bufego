@@ -15,7 +15,7 @@ interface BuffetCartProps {
   placeOrder: (pickupTime: string) => void;
 }
 
-const stripePublishableKey = process.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_51H59owJmQoVhz82aWAoi9M5s8PC6sSAqFI7KfAD2NRKun5riDIOM0dvu2caM25a5f5JbYLMc5Umxw8Dl7dBIDNwM00yVbSX8uS";
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 const BuffetCart: React.FC<BuffetCartProps> = ({ cart, removeFromCart, ordering, orderSuccess, orderError, placeOrder }) => {
