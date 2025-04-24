@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { InventoryItem } from "../../types";
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import StripePaymentForm from './StripePaymentForm';
+import StripePaymentForm from "./StripePaymentForm";
 
 interface BuffetCartProps {
   cart: InventoryItem[];
@@ -15,21 +15,28 @@ interface BuffetCartProps {
   placeOrder: (pickupTime: string) => void;
 }
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
+const stripePublishableKey = process.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 const BuffetCart: React.FC<BuffetCartProps> = ({ cart, removeFromCart, ordering, orderSuccess, orderError, placeOrder }) => {
   const [pickupHour, setPickupHour] = useState<string>("");
   const [pickupMinute, setPickupMinute] = useState<string>("");
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const total = cart.reduce((sum, item) => sum + (item.price || 0), 0);
 
   // Helper to get today's date in yyyy-mm-dd
   const today = new Date().toISOString().slice(0, 10);
   const isPickupValid = pickupHour !== "" && pickupMinute !== "";
 
+  // Reset payment state when cart changes or after successful order
+  useEffect(() => {
+    setPaymentSuccess(false);
+  }, [cart, orderSuccess]);
+
   const handlePlaceOrder = () => {
     if (!isPickupValid) return;
     // Compose ISO string for today with selected hour and minute
-    const pickupTime = `${today}T${pickupHour.padStart(2, "0")}:${pickupMinute.padStart(2, "0")}:00`;
+    const pickupTime = `${today}T${pickupHour.padStart(2, "0")}:{pickupMinute.padStart(2, "0")}":00`;
     placeOrder(pickupTime);
   };
 
@@ -68,13 +75,6 @@ const BuffetCart: React.FC<BuffetCartProps> = ({ cart, removeFromCart, ordering,
             <span className="font-semibold">Total:</span>
             <span className="text-lg font-bold">{total} Ft</span>
           </div>
-          {/* Stripe Payment Section */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Pay securely with card</label>
-            <Elements stripe={stripePromise}>
-              <StripePaymentForm total={total} cart={cart} onPaymentSuccess={handlePlaceOrder} ordering={ordering} />
-            </Elements>
-          </div>
           <div className="mb-2">
             <label className="block text-sm font-medium mb-1">Pickup Time (Today)</label>
             <div className="flex gap-2">
@@ -86,6 +86,7 @@ const BuffetCart: React.FC<BuffetCartProps> = ({ cart, removeFromCart, ordering,
                 placeholder="HH"
                 value={pickupHour}
                 onChange={e => setPickupHour(e.target.value.replace(/[^0-9]/g, "").slice(0,2))}
+                disabled={paymentSuccess}
               />
               <span className="self-center">:</span>
               <input
@@ -96,9 +97,35 @@ const BuffetCart: React.FC<BuffetCartProps> = ({ cart, removeFromCart, ordering,
                 placeholder="MM"
                 value={pickupMinute}
                 onChange={e => setPickupMinute(e.target.value.replace(/[^0-9]/g, "").slice(0,2))}
+                disabled={paymentSuccess}
               />
             </div>
           </div>
+          {/* Stripe Payment Section */}
+          {cart.length > 0 && isPickupValid && !paymentSuccess && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Pay securely with card</label>
+              {!stripePublishableKey ? (
+                <div className="text-red-600 text-sm p-2 bg-red-50 border border-red-200 rounded">
+                  Stripe publishable key is missing. Please set <b>VITE_STRIPE_PUBLISHABLE_KEY</b> in your environment.
+                </div>
+              ) : stripePromise && (
+                <Elements stripe={stripePromise}>
+                  <StripePaymentForm
+                    total={total}
+                    cart={cart}
+                    onPaymentSuccess={() => setPaymentSuccess(true)}
+                    ordering={ordering}
+                  />
+                </Elements>
+              )}
+            </div>
+          )}
+          {paymentSuccess && (
+            <div className="mb-4 p-2 rounded bg-green-50 border border-green-200 text-green-800 text-sm">
+              Payment successful! You can now place your order.
+            </div>
+          )}
         </div>
       )}
       <div className="mt-4">
@@ -106,9 +133,9 @@ const BuffetCart: React.FC<BuffetCartProps> = ({ cart, removeFromCart, ordering,
         {orderError && <div className="mb-3 p-3 rounded bg-red-50 border border-red-200 text-red-800 text-sm">{orderError}</div>}
         <button
           onClick={handlePlaceOrder}
-          disabled={ordering || cart.length === 0 || !isPickupValid}
+          disabled={ordering || cart.length === 0 || !isPickupValid || !paymentSuccess}
           className={`w-full px-6 py-3 rounded-lg text-white font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
-            (ordering || cart.length === 0 || !isPickupValid)
+            (ordering || cart.length === 0 || !isPickupValid || !paymentSuccess)
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-primary hover:bg-primary-dark'
           }`}
