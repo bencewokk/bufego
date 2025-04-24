@@ -84,7 +84,7 @@ export const BuffetDetails = () => {
   };
   // --- End Cart Functions ---
 
-  const placeOrder = async () => {
+  const placeOrder = async (pickupTime: string) => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
       alert("You must be logged in to place an order.");
@@ -96,14 +96,12 @@ export const BuffetDetails = () => {
       return;
     }
 
-    const createdAt = new Date();
-    const pickupTime = new Date(createdAt.getTime() + 15 * 60000);
-
     const orderData = {
       items: cart.map(item => item.name),
       pickupCode: generatePickupCode(),
-      pickupTime,
+      pickupTime: new Date(pickupTime),
       buffetId: buffet?.id,
+      total: cart.reduce((sum, item) => sum + (item.price || 0), 0)
     };
 
     setOrdering(true);
@@ -113,7 +111,7 @@ export const BuffetDetails = () => {
       await axios.post("http://localhost:3000/api/orders", orderData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setOrderSuccess(`Order placed successfully! Your pickup code is ${orderData.pickupCode}. Pickup around ${pickupTime.toLocaleTimeString()}.`);
+      setOrderSuccess(`Order placed successfully! Your pickup code is ${orderData.pickupCode}. Pickup around ${new Date(pickupTime).toLocaleTimeString()}.`);
       setCart([]);
     } catch (error: any) {
       console.error("Error placing order:", error);
