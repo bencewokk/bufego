@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { InventoryItem } from "../../types";
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import StripePaymentForm from './StripePaymentForm';
 
 interface BuffetCartProps {
   cart: InventoryItem[];
@@ -11,6 +14,8 @@ interface BuffetCartProps {
   orderError: string | null;
   placeOrder: (pickupTime: string) => void;
 }
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
 
 const BuffetCart: React.FC<BuffetCartProps> = ({ cart, removeFromCart, ordering, orderSuccess, orderError, placeOrder }) => {
   const [pickupHour, setPickupHour] = useState<string>("");
@@ -62,6 +67,13 @@ const BuffetCart: React.FC<BuffetCartProps> = ({ cart, removeFromCart, ordering,
           <div className="flex justify-between items-center mb-2">
             <span className="font-semibold">Total:</span>
             <span className="text-lg font-bold">{total} Ft</span>
+          </div>
+          {/* Stripe Payment Section */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Pay securely with card</label>
+            <Elements stripe={stripePromise}>
+              <StripePaymentForm total={total} cart={cart} onPaymentSuccess={handlePlaceOrder} ordering={ordering} />
+            </Elements>
           </div>
           <div className="mb-2">
             <label className="block text-sm font-medium mb-1">Pickup Time (Today)</label>
