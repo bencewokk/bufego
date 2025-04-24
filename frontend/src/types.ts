@@ -8,6 +8,7 @@ export interface InventoryItem {
   stockLevel: number;
   lastRestocked?: Date;
   lowStockThreshold: number;
+  price: number; // Added price field
 }
 
 export interface Buffet {

@@ -3,6 +3,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBox, faCheckCircle, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 import { InventoryItem, Order } from "../../../types";
+import { useState } from "react";
 
 interface InventoryPanelProps {
   inventory: InventoryItem[];
@@ -79,6 +80,7 @@ const InventoryPanel = ({ inventory, selectedCategory, setSelectedCategory, orde
               <div className="flex-1 min-w-0">
                 <div className="text-2xl font-bold text-gray-900 mb-1 break-words">
                   {item.name}
+                  <span className="ml-2 text-lg font-normal text-gray-700">{item.price} Ft</span>
                 </div>
                 <div className="text-lg text-gray-700">
                   {preparingOrdersCount[item.name] || 0} being prepared
@@ -108,6 +110,7 @@ const InventoryPanel = ({ inventory, selectedCategory, setSelectedCategory, orde
               <div className="flex-1 min-w-0">
                 <div className="text-2xl font-bold text-gray-900 mb-1 break-words">
                   {item.name}
+                  <span className="ml-2 text-lg font-normal text-gray-700">{item.price} Ft</span>
                 </div>
                 <div className="text-lg text-gray-700">
                   {preparingOrdersCount[item.name] || 0} being prepared

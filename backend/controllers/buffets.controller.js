@@ -140,14 +140,14 @@ export const updateBuffetInventory = async (req, res) => {
 
 export const addInventoryItem = async (req, res) => {
   try {
-    const { name, available, category } = req.body;
+    const { name, available, category, price } = req.body;
     const buffet = await Buffet.findById(req.params.id);
     
     if (!buffet) {
       return res.status(404).json({ message: "Buffet not found" });
     }
     
-    buffet.inventory.push({ name, available, category });
+    buffet.inventory.push({ name, available, category, price });
     await buffet.save();
     
     res.status(201).json(buffet);
@@ -192,6 +192,26 @@ export const toggleItemAvailability = async (req, res) => {
     await buffet.save();
     
     res.json(buffet);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const updateInventoryItem = async (req, res) => {
+  try {
+    const { id, itemId } = req.params;
+    const update = req.body;
+    const buffet = await Buffet.findById(id);
+    if (!buffet) {
+      return res.status(404).json({ message: "Buffet not found" });
+    }
+    const item = buffet.inventory.id(itemId);
+    if (!item) {
+      return res.status(404).json({ message: "Inventory item not found" });
+    }
+    Object.assign(item, update);
+    await buffet.save();
+    res.json(item);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

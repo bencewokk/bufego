@@ -1,5 +1,5 @@
 // components/InventoryList.tsx
-import { FC } from "react";
+import { FC, useState } from "react";
 import axios from "axios";
 import { NavigateFunction } from "react-router-dom";
 import { Buffet, InventoryItem } from "../../types";
@@ -25,6 +25,41 @@ export const InventoryList: FC<InventoryListProps> = ({
     }
     groupedInventory[item.category].push(item);
   });
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<Partial<InventoryItem>>({});
+
+  const handleEditClick = (item: InventoryItem) => {
+    setEditingId(item._id);
+    setEditValues({ ...item });
+  };
+
+  const handleEditChange = (field: keyof InventoryItem, value: any) => {
+    setEditValues((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditSave = async () => {
+    if (!editingId) return;
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    try {
+      await axios.put(
+        `http://localhost:3000/api/buffets/inventory/${buffet.id}/update/${editingId}`,
+        editValues,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEditingId(null);
+      setEditValues({});
+      fetchInventory(buffet.id);
+    } catch (error) {
+      console.error("Error updating item:", error);
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditValues({});
+  };
 
   const handleToggleAvailability = async (itemId: string) => {
     if (!buffet || !itemId) return;
@@ -87,25 +122,52 @@ export const InventoryList: FC<InventoryListProps> = ({
                     item.available ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
                   }`}
                 >
-                  <span className="font-medium">{item.name}</span>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleToggleAvailability(item._id!)}
-                      className={`px-2 py-1 rounded text-sm ${
-                        item.available 
-                          ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                          : 'bg-green-100 text-green-700 hover:bg-green-200'
-                      }`}
-                    >
-                      {item.available ? 'Elfogyott' : 'Elérhető'}
-                    </button>
-                    <button
-                      onClick={() => handleRemoveItem(item._id!)}
-                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200"
-                    >
-                      Törlés
-                    </button>
-                  </div>
+                  {editingId === item._id ? (
+                    <>
+                      <input
+                        className="font-medium border rounded p-1 mr-2"
+                        value={editValues.name || ''}
+                        onChange={e => handleEditChange('name', e.target.value)}
+                      />
+                      <input
+                        className="ml-2 text-gray-700 border rounded p-1 w-24"
+                        type="number"
+                        value={editValues.price || 0}
+                        onChange={e => handleEditChange('price', Number(e.target.value))}
+                      />
+                      <button onClick={handleEditSave} className="ml-2 px-2 py-1 bg-green-600 text-white rounded text-sm">Mentés</button>
+                      <button onClick={handleEditCancel} className="ml-2 px-2 py-1 bg-gray-300 text-gray-800 rounded text-sm">Mégse</button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-medium">{item.name}</span>
+                      <span className="ml-2 text-gray-700">{item.price} Ft</span>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleToggleAvailability(item._id!)}
+                          className={`px-2 py-1 rounded text-sm ${
+                            item.available 
+                              ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                              : 'bg-green-100 text-green-700 hover:bg-green-200'
+                          }`}
+                        >
+                          {item.available ? 'Elfogyott' : 'Elérhető'}
+                        </button>
+                        <button
+                          onClick={() => handleRemoveItem(item._id!)}
+                          className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200"
+                        >
+                          Törlés
+                        </button>
+                        <button
+                          onClick={() => handleEditClick(item)}
+                          className="px-2 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                        >
+                          Szerkeszt
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

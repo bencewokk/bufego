@@ -18,9 +18,14 @@ export const AddItemForm: FC<AddItemFormProps> = ({
   navigate
 }) => {
   const [newItem, setNewItem] = useState<InventoryItem>({ 
+    uniqueId: '',
+    _id: '',
     name: "", 
     available: true, 
-    category: "Egyéb" 
+    category: "Egyéb",
+    price: 0,
+    stockLevel: 0,
+    lowStockThreshold: 0
   });
 
   const handleAddItem = async () => {
@@ -40,7 +45,7 @@ export const AddItemForm: FC<AddItemFormProps> = ({
       );
       
       // Reset form and fetch updated inventory
-      setNewItem({ name: "", available: true, category: "Egyéb" });
+      setNewItem({ uniqueId: '', _id: '', name: "", available: true, category: "Egyéb", price: 0, stockLevel: 0, lowStockThreshold: 0 });
       setShowAddForm(false);
       fetchInventory(buffet.id);
     } catch (error) {
@@ -74,6 +79,17 @@ export const AddItemForm: FC<AddItemFormProps> = ({
             <option value="Ital">Ital</option>
             <option value="Desszert">Desszert</option>
           </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Ár (Ft)</label>
+          <input
+            type="number"
+            min="0"
+            value={newItem.price}
+            onChange={e => setNewItem({...newItem, price: Number(e.target.value)})}
+            className="w-full p-2 border rounded"
+            placeholder="Pl. 500"
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Elérhetőség</label>

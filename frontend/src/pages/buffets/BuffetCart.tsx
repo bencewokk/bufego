@@ -27,6 +27,7 @@ const BuffetCart: React.FC<BuffetCartProps> = ({ cart, removeFromCart, ordering,
         {cart.map(item => (
           <div key={item.uniqueId} className="flex justify-between items-center bg-white p-2 rounded shadow-sm border border-gray-100">
             <span className="text-gray-800 text-sm">{item.name}</span>
+            <span className="text-gray-700 text-sm ml-2">{item.price} Ft</span>
             <button
               onClick={() => removeFromCart(item)}
               className="text-red-500 hover:text-red-700 transition p-1 rounded-full hover:bg-red-50"

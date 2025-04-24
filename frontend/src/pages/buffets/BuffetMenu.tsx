@@ -36,6 +36,7 @@ const BuffetMenu: React.FC<BuffetMenuProps> = ({ inventoryByCategory, cart, addT
                     <span className="transition-colors group-hover:text-primary-dark mr-2" style={{ color: "var(--text)" }}>
                       {item.name}
                     </span>
+                    <span className="text-gray-700 ml-2">{item.price} Ft</span>
                     {item.available ? (
                       <button
                         onClick={() => addToCart(item)}

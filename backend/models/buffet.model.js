@@ -12,7 +12,8 @@ const buffetSchema = new mongoose.Schema({
     {
       name: { type: String, required: true },
       available: { type: Boolean, default: true },
-      category: { type: String, default: "Egyéb" } 
+      category: { type: String, default: "Egyéb" },
+      price: { type: Number, required: true, default: 0 }
     }
   ]
 });
