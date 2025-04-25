@@ -7,6 +7,7 @@ const orderSchema = new mongoose.Schema({
         enum: ["pending", "preparing", "ready", "completed"],
         default: "pending"
     },
+    email: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     pickupCode: { type: String, required: true },
     pickupTime: { type: Date, required: true }
