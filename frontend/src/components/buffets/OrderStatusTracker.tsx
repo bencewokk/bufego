@@ -105,36 +105,52 @@ const OrderStatusTracker: React.FC<OrderStatusTrackerProps> = ({ pickupCode, onC
 
     return (
       <div className="w-full mt-6">
-        <div className="flex justify-between mb-2">
-          {statuses.map((status, index) => (
+        {/* Progress line with steps positioned on top and bottom alternately */}
+        <div className="relative py-8">
+          {/* Center progress line */}
+          <div className="absolute top-1/2 left-0 right-0 h-2 bg-gray-200 rounded-full transform -translate-y-1/2">
             <div 
-              key={status} 
-              className={`flex flex-col items-center ${index <= currentIndex ? 'text-primary' : 'text-gray-400'}`}
-            >
+              className="absolute top-0 left-0 h-2 bg-primary rounded-full transition-all duration-500 ease-in-out"
+              style={{ width: currentIndex >= 0 ? `${(currentIndex / (statuses.length - 1)) * 100}%` : '0%' }}
+            ></div>
+          </div>
+          
+          {/* Status steps positioned symmetrically around the center line */}
+          <div className="flex justify-between relative">
+            {statuses.map((status, index) => (
               <div 
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  index < currentIndex 
-                    ? 'bg-primary text-white' 
-                    : index === currentIndex 
-                      ? 'bg-primary/20 text-primary border-2 border-primary' 
-                      : 'bg-gray-200 text-gray-400'
-                }`}
+                key={status} 
+                className={`flex flex-col items-center ${index <= currentIndex ? 'text-primary' : 'text-gray-400'}`}
               >
-                {index < currentIndex ? (
-                  <FontAwesomeIcon icon={faCheck} className="text-sm" />
-                ) : (
-                  <span className="text-xs font-bold">{index + 1}</span>
-                )}
+                {/* Position steps alternating above and below the line */}
+                <div className={`flex flex-col items-center ${index % 2 === 0 ? 'flex-col' : 'flex-col-reverse'}`}>
+                  <div 
+                    className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
+                      index < currentIndex 
+                        ? 'bg-primary text-white' 
+                        : index === currentIndex 
+                          ? 'bg-primary/20 text-primary border-2 border-primary' 
+                          : 'bg-gray-200 text-gray-400'
+                    }`}
+                  >
+                    {index < currentIndex ? (
+                      <FontAwesomeIcon icon={faCheck} className="text-sm" />
+                    ) : (
+                      <span className="text-xs font-bold">{index + 1}</span>
+                    )}
+                  </div>
+                  
+                  {/* Line connecting to center line */}
+                  <div className={`h-4 w-0.5 ${index <= currentIndex ? 'bg-primary' : 'bg-gray-200'}`}></div>
+                  
+                  {/* Status label */}
+                  <div className={`text-xs mt-1 mb-1 capitalize font-medium ${index <= currentIndex ? 'text-primary' : 'text-gray-400'}`}>
+                    {status}
+                  </div>
+                </div>
               </div>
-              <span className="text-xs mt-1 capitalize">{status}</span>
-            </div>
-          ))}
-        </div>
-        <div className="relative h-2 bg-gray-200 rounded-full">
-          <div 
-            className="absolute top-0 left-0 h-2 bg-primary rounded-full transition-all duration-500 ease-in-out"
-            style={{ width: currentIndex >= 0 ? `${(currentIndex / (statuses.length - 1)) * 100}%` : '0%' }}
-          ></div>
+            ))}
+          </div>
         </div>
       </div>
     );
