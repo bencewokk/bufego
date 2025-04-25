@@ -1,5 +1,5 @@
 import express from "express";
-import { createOrder, getOrders, updateOrderStatus } from "../controllers/orders.controller.js";
+import { createOrder, getOrders, updateOrderStatus, getOrderByPickupCode } from "../controllers/orders.controller.js";
 
 const router = express.Router();
 
@@ -12,5 +12,8 @@ router.post("/", createOrder);
 router.get("/", getOrders);
 
 router.put("/:orderId/status", updateOrderStatus);
+
+// New route to get order by pickup code
+router.get("/pickup/:pickupCode", getOrderByPickupCode);
 
 export default router;

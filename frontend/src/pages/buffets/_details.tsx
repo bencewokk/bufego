@@ -224,10 +224,11 @@ export const BuffetDetails = () => {
             <BuffetCart
               cart={cart}
               removeFromCart={removeFromCart}
-              ordering={ordering}
               orderSuccess={orderSuccess}
               orderError={orderError}
-              placeOrder={placeOrder}
+              buffetName={buffet.name}
+              buffetId={buffet.id}
+              onClearCart={() => setCart([])}
             />
           )}
         </div>

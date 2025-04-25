@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { InventoryItem } from "../../types";
 
 interface StripePaymentFormProps {
@@ -23,7 +23,12 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [cardComplete, setCardComplete] = useState(false);
+  const [cardNumberComplete, setCardNumberComplete] = useState(false);
+  const [cardExpiryComplete, setCardExpiryComplete] = useState(false);
+  const [cardCvcComplete, setCardCvcComplete] = useState(false);
+  const [cardNumberError, setCardNumberError] = useState<string | null>(null);
+  const [cardExpiryError, setCardExpiryError] = useState<string | null>(null);
+  const [cardCvcError, setCardCvcError] = useState<string | null>(null);
   const [isClientReady, setIsClientReady] = useState(false);
 
   // Check if Stripe is initialized
@@ -39,21 +44,28 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     }).format(amount);
   };
 
-  const handleCardChange = (event: any) => {
-    setCardComplete(event.complete);
-    if (event.error) {
-      setError(event.error.message);
-    } else {
-      setError(null);
-    }
+  const handleCardNumberChange = (event: any) => {
+    setCardNumberComplete(event.complete);
+    setCardNumberError(event.error ? event.error.message : null);
   };
+
+  const handleCardExpiryChange = (event: any) => {
+    setCardExpiryComplete(event.complete);
+    setCardExpiryError(event.error ? event.error.message : null);
+  };
+
+  const handleCardCvcChange = (event: any) => {
+    setCardCvcComplete(event.complete);
+    setCardCvcError(event.error ? event.error.message : null);
+  };
+
+  const allCardFieldsComplete = cardNumberComplete && cardExpiryComplete && cardCvcComplete;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Form validation
-    if (!stripe || !elements || !cardComplete) {
-      setError("Please complete card details before proceeding");
+
+    if (!stripe || !elements || !allCardFieldsComplete) {
+      setError("Please complete all card details before proceeding");
       return;
     }
 
@@ -66,43 +78,50 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     setError(null);
 
     try {
-      // Call backend to create PaymentIntent
-      const response = await fetch("/api/payments/create-payment-intent", {
+      // Always create a new PaymentIntent right before confirmation
+      const response = await fetch("http://localhost:3000/api/payments/create-payment-intent", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           "X-Requested-With": "XMLHttpRequest"
         },
         body: JSON.stringify({
           amount: total,
           currency: currency.toLowerCase(),
-          // Backend expects an array of items with name, price, and optional quantity
-          cart: cart.map(item => ({ 
-            name: item.name, 
+          cart: cart.map(item => ({
+            name: item.name,
             price: item.price,
-            quantity: 1
+            quantity: 1 // Assuming quantity is always 1 per cart item for payment intent
           })),
         })
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Server error: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
-      const { clientSecret } = await response.json();
-      if (!clientSecret) throw new Error("No client secret returned");
+      const data = await response.json();
+      const clientSecret = data.clientSecret;
 
-      // Confirm card payment
-      const cardElement = elements.getElement(CardElement);
-      if (!cardElement) throw new Error("Card element not found");
+      if (!clientSecret) {
+        console.error("Backend did not return a client secret.", data); // Log the response data
+        throw new Error("Failed to retrieve payment client secret from server.");
+      }
+
+      console.log("Received clientSecret:", clientSecret); // Log the client secret
+
+      // Confirm card payment with the newly obtained client secret
+      const cardNumberElement = elements.getElement(CardNumberElement);
+      if (!cardNumberElement) {
+        throw new Error("Card number element not found");
+      }
 
       const paymentResult = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: { 
-          card: cardElement,
+        payment_method: {
+          card: cardNumberElement,
           billing_details: {
-            // You could collect these from the user if needed
-            // name: billingName
+            // Add billing details if needed/collected
           }
         }
       });
@@ -118,6 +137,7 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
       }
     } catch (err: any) {
       const errorMessage = err.message || "Payment processing error";
+      console.error("Payment error:", err);
       setError(errorMessage);
       if (onPaymentError) {
         onPaymentError(errorMessage);
@@ -149,25 +169,54 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-        <label htmlFor="card-element" className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           Kártyaadatok
         </label>
-        <div className="p-3 border rounded-md bg-white focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
-          <CardElement 
-            id="card-element"
-            options={CARD_ELEMENT_OPTIONS} 
-            onChange={handleCardChange}
-            className="w-full" 
-          />
-        </div>
-        {error && (
-          <div className="mt-2 text-red-600 text-sm flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            {error}
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs text-gray-600">Kártyaszám</label>
+            <div className="p-2 border rounded-md bg-white focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+              <CardNumberElement
+                options={CARD_ELEMENT_OPTIONS}
+                onChange={handleCardNumberChange}
+                className="w-full"
+              />
+            </div>
+            {cardNumberError && <div className="text-red-600 text-xs mt-1">{cardNumberError}</div>}
           </div>
-        )}
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="text-xs text-gray-600">Lejárat</label>
+              <div className="p-2 border rounded-md bg-white focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+                <CardExpiryElement
+                  options={CARD_ELEMENT_OPTIONS}
+                  onChange={handleCardExpiryChange}
+                  className="w-full"
+                />
+              </div>
+              {cardExpiryError && <div className="text-red-600 text-xs mt-1">{cardExpiryError}</div>}
+            </div>
+            <div className="flex-1">
+              <label className="text-xs text-gray-600">CVC</label>
+              <div className="p-2 border rounded-md bg-white focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+                <CardCvcElement
+                  options={CARD_ELEMENT_OPTIONS}
+                  onChange={handleCardCvcChange}
+                  className="w-full"
+                />
+              </div>
+              {cardCvcError && <div className="text-red-600 text-xs mt-1">{cardCvcError}</div>}
+            </div>
+          </div>
+          {error && (
+            <div className="mt-2 text-red-600 text-sm flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              {error}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex justify-between items-center py-2 border-t border-gray-200">
@@ -177,7 +226,7 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
 
       <button
         type="submit"
-        disabled={!isClientReady || ordering || processing || !cardComplete}
+        disabled={!isClientReady || ordering || processing || !allCardFieldsComplete}
         className="w-full px-4 py-3 bg-primary text-white rounded-md font-medium transition-colors 
                  hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
                  disabled:bg-gray-400 disabled:cursor-not-allowed"

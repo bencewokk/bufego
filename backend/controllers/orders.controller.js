@@ -38,3 +38,23 @@ export const updateOrderStatus = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+export const getOrderByPickupCode = async (req, res) => {
+    try {
+        const { pickupCode } = req.params;
+        
+        if (!pickupCode) {
+            return res.status(400).json({ message: "Pickup code is required" });
+        }
+        
+        const order = await Order.findOne({ pickupCode });
+        
+        if (!order) {
+            return res.status(404).json({ message: "Order not found with this pickup code" });
+        }
+        
+        res.status(200).json(order);
+    } catch (error) {
+        res.status(500).json({ message: "Server error: " + error.message });
+    }
+};
