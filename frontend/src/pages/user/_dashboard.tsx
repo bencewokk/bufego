@@ -33,21 +33,27 @@ const UserDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-[var(--background)] flex flex-col">
       <Navbar />
-      <main className="flex flex-col items-center justify-center py-12 px-4">
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg p-8">
-          <h1 className="text-3xl font-bold mb-6 text-center text-[var(--primary)]">Felhasználói fiók</h1>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="font-semibold text-gray-700">Email:</span>
-              <span className="text-gray-900">{user.email || user.username}</span>
+      <main className="flex-1 flex flex-col items-center justify-center py-12 px-2 md:px-8">
+        <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl p-6 md:p-12">
+          <h1 className="text-3xl font-extrabold mb-10 text-center text-[var(--primary)] tracking-tight">Felhasználói fiók</h1>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Info Island: Email */}
+            <div className="bg-[var(--background)] rounded-xl shadow p-6 flex flex-col items-center min-h-[120px]">
+              <span className="text-lg font-semibold text-gray-600 mb-2">Email</span>
+              <span className="text-xl font-bold text-gray-900 break-all">{user.email || user.username}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="font-semibold text-gray-700">Szerep:</span>
-              <span className="text-gray-900">{user.role}</span>
+            {/* Info Island: Role */}
+            <div className="bg-[var(--background)] rounded-xl shadow p-6 flex flex-col items-center min-h-[120px]">
+              <span className="text-lg font-semibold text-gray-600 mb-2">Szerep</span>
+              <span className="text-xl font-bold text-gray-900 capitalize">{user.role}</span>
             </div>
-            {/* Ide jöhetnek további felhasználói adatok vagy funkciók */}
+            {/* Placeholder for future info islands */}
+            <div className="bg-[var(--background)] rounded-xl shadow p-6 flex flex-col items-center min-h-[120px] opacity-60 border-2 border-dashed border-gray-300">
+              <span className="text-lg font-semibold text-gray-400 mb-2">További információ</span>
+              <span className="text-md text-gray-400 text-center">Itt fog megjelenni a rendelési előzmény, kuponok, stb.</span>
+            </div>
           </div>
         </div>
       </main>

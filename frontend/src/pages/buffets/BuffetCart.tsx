@@ -12,6 +12,7 @@ import PickupTimeSelector from "../../components/buffets/PickupTimeSelector";
 import EmptyCart from "../../components/buffets/EmptyCart";
 import { motion } from "framer-motion";
 import { generatePickupCode } from "./utils";
+import { jwtDecode } from "jwt-decode";
 
 interface BuffetCartProps {
   cart: InventoryItem[];
@@ -81,7 +82,21 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
     setIsProcessingPayment(false);
     setEmailAccepted(false);
     setEditingEmail(false);
-    setEmail("");
+    // Try to prefill email from JWT if available
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        const decoded = jwtDecode(token);
+        // @ts-ignore
+        const userEmail = decoded.email || decoded.username;
+        if (userEmail) setEmail(userEmail);
+        else setEmail("");
+      } else {
+        setEmail("");
+      }
+    } catch {
+      setEmail("");
+    }
     setCartAccepted(false);
   }, [cart]);
 
