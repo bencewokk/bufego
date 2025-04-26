@@ -1,4 +1,11 @@
+import React, { useState } from "react";
+import OrderStatusTracker from "../buffets/OrderStatusTracker";
+
 export const Hero = () => {
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [pickupCode, setPickupCode] = useState("");
+  const [submittedCode, setSubmittedCode] = useState("");
+
   return (
     <div className="bg-gradient-to-r to-[var(--primary-light)] from-[var(--primary)] py-16 md:py-24 relative overflow-hidden">
       {/* CSS Animations */}
@@ -97,25 +104,33 @@ export const Hero = () => {
               Keresd meg a legjobb büféket, nézd meg a menüt és rendelj előre - 
               minden egy helyen!
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 flex-wrap sm:flex-nowrap">
+              <button
+                type="button"
+                className="bg-white text-[var(--primary)] px-6 py-3 rounded-full font-medium text-center hover:bg-gray-100 transition-colors border-2 border-white"
+                onClick={() => { setShowOrderModal(true); setSubmittedCode(""); setPickupCode(""); }}
+                style={{whiteSpace: 'nowrap'}}
+              >
+                Rendelés követése
+              </button>
               <a 
                 href="/signup" 
-                className="bg-white text-[var(--primary)] px-6 py-3 rounded-full 
-                          font-medium text-center hover:bg-gray-100 transition-colors"
+                className="border-2 border-white text-white px-6 py-3 rounded-full font-medium text-center hover:bg-white/10 transition-colors"
+                style={{whiteSpace: 'nowrap'}}
               >
                 Regisztráció
               </a>
               <a 
                 href="/about" 
-                className="border-2 border-white text-white px-6 py-3 rounded-full 
-                          font-medium text-center hover:bg-white/10 transition-colors"
+                className="border-2 border-white text-white px-6 py-3 rounded-full font-medium text-center hover:bg-white/10 transition-colors"
+                style={{whiteSpace: 'nowrap'}}
               >
                 Tudj meg többet
               </a>
               <a 
                 href="/buffet-login" 
-                className="border-2 border-white text-white px-6 py-3 rounded-full 
-                          font-medium text-center hover:bg-white/10 transition-colors"
+                className="border-2 border-white text-white px-6 py-3 rounded-full font-medium text-center hover:bg-white/10 transition-colors"
+                style={{whiteSpace: 'nowrap'}}
               >
                 Van már büféd?
               </a>
@@ -134,6 +149,49 @@ export const Hero = () => {
           </div>
         </div>
       </div>
+
+      {/* Order Tracking Modal */}
+      {showOrderModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl"
+              onClick={() => setShowOrderModal(false)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            {!submittedCode ? (
+              <form
+                onSubmit={e => {
+                  e.preventDefault();
+                  if (pickupCode.trim()) setSubmittedCode(pickupCode.trim());
+                }}
+              >
+                <h2 className="text-xl font-bold mb-4 text-[var(--primary)]">Rendelés követése</h2>
+                <label className="block mb-2 text-sm font-medium text-gray-700">Átvételi kód</label>
+                <input
+                  type="text"
+                  className="border p-2 rounded w-full mb-4"
+                  placeholder="Írd be az átvételi kódod..."
+                  value={pickupCode}
+                  onChange={e => setPickupCode(e.target.value)}
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  className="w-full bg-[var(--primary)] text-white py-2 rounded font-semibold hover:bg-[var(--primary-dark)] transition"
+                  disabled={!pickupCode.trim()}
+                >
+                  Követés
+                </button>
+              </form>
+            ) : (
+              <OrderStatusTracker pickupCode={submittedCode} onClose={() => setShowOrderModal(false)} />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,8 +2,8 @@ import Order from "../models/order.model.js";
 
 export const createOrder = async (req, res) => {
     try {
-        const { items, pickupCode, pickupTime } = req.body;
-        const order = new Order({ items, pickupCode, pickupTime });
+        const { items, pickupCode, pickupTime, email } = req.body;
+        const order = new Order({ items, pickupCode, pickupTime, email });
         await order.save();
         res.status(201).json({ message: "Order created", order });
     } catch (error) {

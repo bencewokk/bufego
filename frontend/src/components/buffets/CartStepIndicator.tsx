@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 // Define step structure
 export const cartSteps = [
   { label: "Cart", icon: faShoppingCart },
+  { label: "Email", icon: faCheckCircle },
   { label: "Pickup Time", icon: faClock },
   { label: "Payment", icon: faCreditCard },
   { label: "Done", icon: faCheckCircle },

@@ -7,7 +7,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import StripePaymentForm from "./StripePaymentForm";
 import OrderConfirmation from "../../components/buffets/OrderConfirmation";
 import CartItem from "../../components/buffets/CartItem";
-import CartStepIndicator, { cartSteps } from "../../components/buffets/CartStepIndicator";
+import CartStepIndicator from "../../components/buffets/CartStepIndicator";
 import PickupTimeSelector from "../../components/buffets/PickupTimeSelector";
 import EmptyCart from "../../components/buffets/EmptyCart";
 import { motion } from "framer-motion";
@@ -25,11 +25,13 @@ interface BuffetCartProps {
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_51H59owJmQoVhz82aWAoi9M5s8PC6sSAqFI7KfAD2NRKun5riDIOM0dvu2caM25a5f5JbYLMc5Umxw8Dl7dBIDNwM00yVbSX8uS";
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
-function getCurrentStep(cart: InventoryItem[], isPickupValid: boolean, paymentSuccess: boolean) {
+// Update step logic
+function getCurrentStep(cart: InventoryItem[], emailAccepted: boolean, editingEmail: boolean, isPickupValid: boolean, paymentSuccess: boolean) {
   if (!cart.length) return 0;
-  if (!isPickupValid) return 1;
-  if (!paymentSuccess) return 2;
-  return 3;
+  if (!emailAccepted || editingEmail) return 1;
+  if (!isPickupValid) return 2;
+  if (!paymentSuccess) return 3;
+  return 4;
 }
 
 type PaymentStatus = 'idle' | 'processing' | 'success' | 'error';
@@ -50,10 +52,14 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
   const [pickupCode, setPickupCode] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [emailAccepted, setEmailAccepted] = useState(false);
+  const [editingEmail, setEditingEmail] = useState(false);
   const total = cart.reduce((sum, item) => sum + (item.price || 0), 0);
 
   const today = new Date().toISOString().slice(0, 10);
   const isPickupValid = pickupHour !== "" && pickupMinute !== "";
+  const isEmailValid = email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 
   useEffect(() => {
     const now = new Date();
@@ -70,9 +76,19 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
     setPaymentError(null);
     setPickupCode(null);
     setIsProcessingPayment(false);
+    setEmailAccepted(false);
+    setEditingEmail(false);
+    setEmail("");
   }, [cart]);
 
   const handlePaymentSuccess = async () => {
+    if (!email || !isEmailValid) {
+      setEmailAccepted(false);
+      setEditingEmail(true);
+      setPaymentError('Kérjük, adj meg egy érvényes email címet a rendeléshez!');
+      setPaymentStatus('error');
+      return;
+    }
     console.log("Payment successful!");
     // Generate pickup code
     const generatedCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -94,7 +110,8 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
           pickupCode: generatedCode,
           pickupTime: pickupDateTime,
           buffetId: buffetId,
-          status: "pending"
+          status: "pending",
+          email: email
         })
       });
 
@@ -133,7 +150,7 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
     onClearCart();
   };
 
-  const currentStep = getCurrentStep(cart, isPickupValid && pickupAccepted, paymentStatus === 'success');
+  const currentStep = getCurrentStep(cart, emailAccepted, editingEmail, isPickupValid && pickupAccepted, paymentStatus === 'success');
 
   if (!stripePromise) {
     return <div>Hiba: Stripe nincs konfigurálva. Ellenőrizd a VITE_STRIPE_PUBLISHABLE_KEY környezeti változót.</div>;
@@ -179,18 +196,61 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
                 <span className="text-xl font-bold text-primary">{total} Ft</span>
               </div>
 
-              <PickupTimeSelector 
-                pickupHour={pickupHour}
-                setPickupHour={setPickupHour}
-                pickupMinute={pickupMinute}
-                setPickupMinute={setPickupMinute}
-                pickupAccepted={pickupAccepted}
-                setPickupAccepted={setPickupAccepted}
-                isPickupValid={isPickupValid}
-                paymentStatus={paymentStatus}
-              />
+              {cart.length > 0 && (!emailAccepted || editingEmail) && (
+                <div className="bg-white rounded-lg p-4 border border-gray-100 mb-6">
+                  <div className="flex items-center mb-2">
+                    <FontAwesomeIcon icon={faCreditCard} className="text-[var(--primary)] text-lg mr-3" />
+                    <h2 className="text-base font-bold" style={{ color: "var(--text)" }}>
+                      Email
+                    </h2>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="email"
+                      className="border p-2 rounded flex-1 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary-light)] transition"
+                      placeholder="Email address"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                    />
+                    <button
+                      className="px-4 py-2 bg-[var(--primary)] text-white rounded disabled:opacity-50 transition"
+                      disabled={!isEmailValid}
+                      onClick={() => { setEmailAccepted(true); setEditingEmail(false); }}
+                    >Elfogad</button>
+                  </div>
+                  {!isEmailValid && email && (
+                    <div className="text-xs text-red-500 mt-1">Adj meg egy érvényes email címet.</div>
+                  )}
+                </div>
+              )}
 
-              {cart.length > 0 && isPickupValid && pickupAccepted && (
+              {cart.length > 0 && emailAccepted && !editingEmail && (
+                <div className="bg-white rounded-lg p-4 border border-gray-100 mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FontAwesomeIcon icon={faCreditCard} className="text-[var(--primary)] text-lg mr-2" />
+                    <span className="text-sm text-gray-700">Email: <span className="font-medium">{email}</span></span>
+                  </div>
+                  <button
+                    className="text-xs text-[var(--primary)] underline ml-2"
+                    onClick={() => setEditingEmail(true)}
+                  >Módosít</button>
+                </div>
+              )}
+
+              {cart.length > 0 && emailAccepted && !editingEmail && (
+                <PickupTimeSelector 
+                  pickupHour={pickupHour}
+                  setPickupHour={setPickupHour}
+                  pickupMinute={pickupMinute}
+                  setPickupMinute={setPickupMinute}
+                  pickupAccepted={pickupAccepted}
+                  setPickupAccepted={setPickupAccepted}
+                  isPickupValid={isPickupValid}
+                  paymentStatus={paymentStatus}
+                />
+              )}
+
+              {cart.length > 0 && emailAccepted && !editingEmail && isPickupValid && pickupAccepted && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
                     <FontAwesomeIcon icon={faCreditCard} className="text-primary mr-2" />

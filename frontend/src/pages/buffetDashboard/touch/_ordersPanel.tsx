@@ -48,6 +48,7 @@ const OrdersPanel = ({
   
   // --- This helper performs an optimistic update before calling the parent update ---
   const handleOrderUpdate = async (orderId: string, newStatus: Order["status"]) => {
+    console.log("Updating order status", { orderId, newStatus });
     try {
       await axios.put(`http://localhost:3000/api/orders/${orderId}/status`, { status: newStatus });
       // Refetch orders to ensure the state is up-to-date
@@ -58,8 +59,13 @@ const OrdersPanel = ({
         pickupTime: new Date(order.pickupTime),
         createdAt: new Date(order.createdAt),
       })));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating order status:", error);
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(`Failed to update order status: ${error.response.data.message}`);
+      } else {
+        alert("Failed to update order status. Please try again.");
+      }
     }
   };
 

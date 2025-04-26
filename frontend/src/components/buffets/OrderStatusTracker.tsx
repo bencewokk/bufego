@@ -102,55 +102,37 @@ const OrderStatusTracker: React.FC<OrderStatusTrackerProps> = ({ pickupCode, onC
   const renderStatusProgress = () => {
     const statuses: OrderStatus[] = ['pending', 'preparing', 'ready', 'completed'];
     const currentIndex = order ? statuses.indexOf(order.status) : -1;
-
+    // Medium size: width 320px, circles w-7 h-7, move circles a bit further down
     return (
-      <div className="w-full mt-6">
-        {/* Progress line with steps positioned on top and bottom alternately */}
-        <div className="relative py-8">
-          {/* Center progress line */}
-          <div className="absolute top-1/2 left-0 right-0 h-2 bg-gray-200 rounded-full transform -translate-y-1/2">
-            <div 
-              className="absolute top-0 left-0 h-2 bg-primary rounded-full transition-all duration-500 ease-in-out"
-              style={{ width: currentIndex >= 0 ? `${(currentIndex / (statuses.length - 1)) * 100}%` : '0%' }}
-            ></div>
-          </div>
-          
-          {/* Status steps positioned symmetrically around the center line */}
-          <div className="flex justify-between relative">
-            {statuses.map((status, index) => (
-              <div 
-                key={status} 
-                className={`flex flex-col items-center ${index <= currentIndex ? 'text-primary' : 'text-gray-400'}`}
+      <div className="w-full mt-6 flex justify-center">
+        <div className="relative flex items-center justify-between" style={{height: 56, width: 700, minWidth: 0}}>
+          {/* Progress bar background */}
+          <div className="absolute left-0 right-0 top-[70%] h-1 bg-gray-200 rounded-full" style={{transform: 'translateY(-50%)'}} />
+          {/* Progress bar foreground */}
+          <div className="absolute left-0 top-[70%] h-1 bg-[var(--primary)] rounded-full transition-all duration-500" style={{width: `${(currentIndex/(statuses.length-1))*100}%`, transform: 'translateY(-50%)'}} />
+          {/* Steps */}
+          {statuses.map((status, idx) => {
+            const isCompleted = idx < currentIndex;
+            const isCurrent = idx === currentIndex;
+            // Calculate left position as a percentage of the new, medium width
+            const left = `${(idx/(statuses.length-1))*100}%`;
+            return (
+              <div
+                key={status}
+                className="absolute flex flex-col items-center z-10"
+                style={{left, top: '90%', transform: 'translate(-50%, -50%)'}}
               >
-                {/* Position steps alternating above and below the line */}
-                <div className={`flex flex-col items-center ${index % 2 === 0 ? 'flex-col' : 'flex-col-reverse'}`}>
-                  <div 
-                    className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
-                      index < currentIndex 
-                        ? 'bg-primary text-white' 
-                        : index === currentIndex 
-                          ? 'bg-primary/20 text-primary border-2 border-primary' 
-                          : 'bg-gray-200 text-gray-400'
-                    }`}
-                  >
-                    {index < currentIndex ? (
-                      <FontAwesomeIcon icon={faCheck} className="text-sm" />
-                    ) : (
-                      <span className="text-xs font-bold">{index + 1}</span>
-                    )}
-                  </div>
-                  
-                  {/* Line connecting to center line */}
-                  <div className={`h-4 w-0.5 ${index <= currentIndex ? 'bg-primary' : 'bg-gray-200'}`}></div>
-                  
-                  {/* Status label */}
-                  <div className={`text-xs mt-1 mb-1 capitalize font-medium ${index <= currentIndex ? 'text-primary' : 'text-gray-400'}`}>
-                    {status}
-                  </div>
+                <div className={`flex items-center justify-center w-7 h-7 rounded-full border-2 text-base ${
+                  isCompleted ? 'bg-[var(--primary)] border-[var(--primary)] text-white' :
+                  isCurrent ? 'bg-white border-[var(--primary)] text-[var(--primary)] font-bold' :
+                  'bg-gray-100 border-gray-300 text-gray-400'
+                }`}>
+                  {isCompleted ? <FontAwesomeIcon icon={faCheck} /> : idx+1}
                 </div>
+                <span className={`mt-1 text-xs ${isCurrent ? 'text-[var(--primary)] font-semibold' : isCompleted ? 'text-gray-700' : 'text-gray-400'}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
     );
