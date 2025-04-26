@@ -1,10 +1,69 @@
 import Order from "../models/order.model.js";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+
+const ENCRYPTION_KEY = process.env.EMAIL_ENCRYPTION_KEY || 'default_key_32_bytes_long_123456'; // Must be 32 bytes for aes-256
+const IV_LENGTH = 16;
+
+function encrypt(text) {
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+    let encrypted = cipher.update(text);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return iv.toString('hex') + ':' + encrypted.toString('hex');
+}
+
+function decrypt(text) {
+    const textParts = text.split(':');
+    const iv = Buffer.from(textParts.shift(), 'hex');
+    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+}
 
 export const createOrder = async (req, res) => {
     try {
         const { items, pickupCode, pickupTime, email } = req.body;
-        const order = new Order({ items, pickupCode, pickupTime, email });
+        const encryptedEmail = email ? encrypt(email) : undefined;
+        const order = new Order({ items, pickupCode, pickupTime, email: encryptedEmail });
         await order.save();
+
+        // Send receipt email
+        if (email) {
+            // Configure your SMTP transport (replace with your real credentials)
+            const transporter = nodemailer.createTransport({
+                service: 'gmail', // or your SMTP provider
+                auth: {
+                    user: process.env.SMTP_USER || 'your@email.com',
+                    pass: process.env.SMTP_PASS || 'yourpassword',
+                },
+            });
+
+            const itemList = items.map(item => `<li>${item}</li>`).join('');
+            const total = items.reduce((sum, item) => {
+                const match = item.match(/\((\d+) Ft\)/);
+                return sum + (match ? parseInt(match[1], 10) : 0);
+            }, 0);
+            const html = `
+                <h2>Köszönjük a rendelésed!</h2>
+                <p><b>Átvételi kód:</b> <span style='color:#888'>(Ne mutasd meg ezt a kódot, csak mondd be az átvételkor!)</span></p>
+                <p><b>Átvételi idő:</b> ${new Date(pickupTime).toLocaleString('hu-HU')}</p>
+                <p><b>Tételek:</b></p>
+                <ul>${itemList}</ul>
+                <p><b>Összesen:</b> ${total} Ft</p>
+                <p>Kérjük, <b>ne mutasd meg ezt a kódot</b>, csak <b>mondd be az átvételkor</b>.</p>
+            `;
+
+            await transporter.sendMail({
+                from: process.env.SMTP_FROM || 'no-reply@bufego.hu',
+                to: email,
+                subject: 'BüféGO rendelés visszaigazolás',
+                html,
+            });
+        }
+
         res.status(201).json({ message: "Order created", order });
     } catch (error) {
         res.status(500).json({ message: "Server error: " + error.message });
@@ -30,8 +89,40 @@ export const updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: "Order not found" });
         }
 
+        const prevStatus = order.status;
         order.status = status;
         await order.save();
+
+        // Send ready-for-pickup email if status changed to 'ready' and email exists
+        if (status === 'ready' && prevStatus !== 'ready' && order.email) {
+            const decryptedEmail = decrypt(order.email);
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.SMTP_USER || 'your@email.com',
+                    pass: process.env.SMTP_PASS || 'yourpassword',
+                },
+            });
+            const totalReady = order.items.reduce((sum, item) => {
+                const match = item.match(/\((\d+) Ft\)/);
+                return sum + (match ? parseInt(match[1], 10) : 0);
+            }, 0);
+            const html = `
+                <h2>Rendelésed elkészült!</h2>
+                <p><b>Átvételi kód:</b> <span style='color:#888'>(Ne mutasd meg ezt a kódot, csak mondd be az átvételkor!)</span></p>
+                <p><b>Átvételi idő:</b> ${new Date(order.pickupTime).toLocaleString('hu-HU')}</p>
+                <p><b>Tételek:</b></p>
+                <ul>${order.items.map(item => `<li>${item}</li>`).join('')}</ul>
+                <p><b>Összesen:</b> ${totalReady} Ft</p>
+                <p>Rendelésed elkészült, átveheted a pultnál. <b>Ne mutasd meg ezt a kódot, csak mondd be az átvételkor.</b></p>
+            `;
+            await transporter.sendMail({
+                from: process.env.SMTP_FROM || 'no-reply@bufego.hu',
+                to: decryptedEmail,
+                subject: 'BüféGO rendelésed elkészült! Átvételre kész',
+                html,
+            });
+        }
 
         res.json(order);
     } catch (error) {
