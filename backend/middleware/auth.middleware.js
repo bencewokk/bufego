@@ -15,3 +15,10 @@ export const authenticate = (req, res, next) => {
     next();
   });
 };
+
+export const requireBuffet = (req, res, next) => {
+  if (!req.user || req.user.role !== "buffet") {
+    return res.status(403).json({ message: "Csak büfé bejelentkezéssel elérhető." });
+  }
+  next();
+};

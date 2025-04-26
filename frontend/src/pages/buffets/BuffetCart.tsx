@@ -169,13 +169,14 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest"
+          "X-Requested-With": "XMLHttpRequest",
+          ...(localStorage.getItem("accessToken") && { Authorization: `Bearer ${localStorage.getItem("accessToken")}` })
         },
         body: JSON.stringify({
           items: cart.map(item => `${item.name} (${item.price} Ft)`),
           pickupCode: generatedCode,
           pickupTime: pickupDateTime,
-          buffetId: buffetId,
+          buffetId: buffetId, // Ensure buffetId is sent
           status: "pending",
           email: email
         })

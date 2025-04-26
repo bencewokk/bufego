@@ -27,7 +27,11 @@ function decrypt(text) {
 
 export const createOrder = async (req, res) => {
     try {
-        const { items, pickupCode, pickupTime, email } = req.body;
+        const { items, pickupCode, pickupTime, email, buffetId } = req.body;
+
+        if (!buffetId) {
+            return res.status(400).json({ message: "buffetId is required for order creation." });
+        }
 
         // LOGGING: Incoming order details
         console.log('--- Incoming Order ---');
@@ -49,7 +53,7 @@ export const createOrder = async (req, res) => {
         }
 
         const encryptedEmail = email ? encrypt(email) : undefined;
-        const order = new Order({ items, pickupCode, pickupTime, email: encryptedEmail });
+        const order = new Order({ items, pickupCode, pickupTime, email: encryptedEmail, buffetId });
         await order.save();
 
         // Send receipt email
@@ -167,6 +171,54 @@ export const getOrderByPickupCode = async (req, res) => {
         }
         
         res.status(200).json(order);
+    } catch (error) {
+        res.status(500).json({ message: "Server error: " + error.message });
+    }
+};
+
+export const getMyOrders = async (req, res) => {
+    try {
+        const userEmail = req.user?.email?.toLowerCase();
+        if (!userEmail) {
+            return res.status(400).json({ message: "No user email found in token." });
+        }
+        // Get all orders, decrypt email, and filter by user email
+        const orders = await Order.find();
+        const decryptedOrders = orders
+            .map(order => {
+                let decryptedEmail = null;
+                try {
+                    decryptedEmail = order.email ? decrypt(order.email) : null;
+                } catch {
+                    decryptedEmail = null;
+                }
+                return { ...order.toObject(), decryptedEmail };
+            })
+            .filter(order => order.decryptedEmail && order.decryptedEmail.toLowerCase() === userEmail);
+        res.status(200).json(decryptedOrders);
+    } catch (error) {
+        res.status(500).json({ message: "Server error: " + error.message });
+    }
+};
+
+export const getBuffetOrders = async (req, res) => {
+    try {
+        const buffetId = req.user?.id;
+        if (!buffetId) {
+            return res.status(400).json({ message: "No buffet id found in token." });
+        }
+        const orders = await Order.find({ buffetId }).sort({ createdAt: -1 });
+        // Optionally, decrypt email for display
+        const ordersWithDecryptedEmail = orders.map(order => {
+            let decryptedEmail = null;
+            try {
+                decryptedEmail = order.email ? decrypt(order.email) : null;
+            } catch {
+                decryptedEmail = null;
+            }
+            return { ...order.toObject(), decryptedEmail };
+        });
+        res.status(200).json(ordersWithDecryptedEmail);
     } catch (error) {
         res.status(500).json({ message: "Server error: " + error.message });
     }

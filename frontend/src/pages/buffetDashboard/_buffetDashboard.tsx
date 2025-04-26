@@ -6,6 +6,7 @@ import { Navbar } from "../../components/landing/Navbar";
 import { BuffetDetails } from "../../components/buffetDashboard/BuffetDetails";
 import { BuffetImage } from "../../components/buffetDashboard/BuffetImage";
 import { InventoryManagement } from "../../components/buffetDashboard/InventoryManagement";
+import { BuffetOrderHistoryIsland } from "../../components/buffetDashboard/BuffetOrderHistoryIsland.tsx";
 import { Buffet, InventoryItem } from "../../types";
 
 export const BuffetDashboard = () => {
@@ -107,6 +108,9 @@ export const BuffetDashboard = () => {
           fetchInventory={fetchInventory}
           navigate={navigate}
         />
+
+        {/* Buffet Order History Island */}
+        <BuffetOrderHistoryIsland />
         
         <button
           onClick={handleLogout}

@@ -10,7 +10,8 @@ const orderSchema = new mongoose.Schema({
     email: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     pickupCode: { type: String, required: true },
-    pickupTime: { type: Date, required: true }
+    pickupTime: { type: Date, required: true },
+    buffetId: { type: mongoose.Schema.Types.ObjectId, ref: 'Buffet', required: true }
 });
 
 export default mongoose.model("Order", orderSchema);
