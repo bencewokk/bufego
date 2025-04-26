@@ -30,13 +30,13 @@ const CartStepIndicator: React.FC<CartStepIndicatorProps> = ({ currentStep }) =>
               initial={{ scale: 0.8, opacity: 0.5 }}
               animate={{
                 scale: currentStep === idx ? 1.15 : 1,
-                opacity: currentStep >= idx ? 1 : 0.5,
-                backgroundColor: currentStep >= idx ? 'var(--primary)' : '#e5e7eb',
+                opacity: currentStep > idx ? 1 : 0.5,
+                backgroundColor: currentStep > idx ? 'var(--primary)' : '#e5e7eb',
               }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className={`w-4 h-4 rounded-full mb-2 ${currentStep >= idx ? 'bg-[var(--primary)]' : 'bg-gray-200'} shadow`}
+              className={`w-4 h-4 rounded-full mb-2 ${currentStep > idx ? 'bg-[var(--primary)]' : 'bg-gray-200'} shadow`}
             />
-            <span className={`text-xs font-medium ${currentStep >= idx ? 'text-[var(--primary)]' : 'text-gray-400'}`}>
+            <span className={`text-xs font-medium ${currentStep > idx ? 'text-[var(--primary)]' : 'text-gray-400'}`}>
               {step.label}
             </span>
           </div>
