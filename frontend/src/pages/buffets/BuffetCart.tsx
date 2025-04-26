@@ -59,6 +59,8 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
   const [emailAccepted, setEmailAccepted] = useState(false);
   const [editingEmail, setEditingEmail] = useState(false);
   const [cartAccepted, setCartAccepted] = useState(false);
+  const [registeredEmails, setRegisteredEmails] = useState<string[]>([]);
+  const [emailCheckError, setEmailCheckError] = useState<string | null>(null);
   const total = cart.reduce((sum, item) => sum + (item.price || 0), 0);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -100,6 +102,37 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
     setCartAccepted(false);
   }, [cart]);
 
+  useEffect(() => {
+    // Fetch all registered user and buffet emails for client-side validation
+    const fetchEmails = async () => {
+      try {
+        const [usersRes, buffetsRes] = await Promise.all([
+          fetch("http://localhost:3000/api/auth/all-emails"),
+          fetch("http://localhost:3000/api/buffets/get")
+        ]);
+        const users = await usersRes.json();
+        const buffets = await buffetsRes.json();
+        const userEmails = Array.isArray(users) ? users.map((u: any) => u.email?.toLowerCase()).filter(Boolean) : [];
+        const buffetEmails = Array.isArray(buffets) ? buffets.map((b: any) => b.email?.toLowerCase()).filter(Boolean) : [];
+        setRegisteredEmails([...userEmails, ...buffetEmails]);
+      } catch (err) {
+        // Ignore error, just don't block
+      }
+    };
+    fetchEmails();
+  }, []);
+
+  // Automatically check email validity and registration status
+  useEffect(() => {
+    setEmailCheckError(null);
+    const token = localStorage.getItem("accessToken");
+    const isLoggedIn = !!token;
+    if (!isLoggedIn && email && registeredEmails.includes(email.toLowerCase())) {
+      setEmailCheckError("Ez az email regisztrált felhasználóhoz vagy büféhez tartozik. Kérjük, jelentkezz be a rendeléshez.");
+      setEmailAccepted(false);
+    }
+  }, [email, registeredEmails]);
+
   const handlePaymentSuccess = async () => {
     if (!email || !isEmailValid) {
       setEmailAccepted(false);
@@ -108,6 +141,22 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
       setPaymentStatus('error');
       return;
     }
+
+    // If user is logged in, ensure the email matches the one in the JWT
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        const decoded = jwtDecode(token);
+        // @ts-ignore
+        const userEmail = decoded.email;
+        if (userEmail && userEmail !== email) {
+          setPaymentError('Bejelentkezett felhasználóként csak a saját email címeddel rendelhetsz.');
+          setPaymentStatus('error');
+          return;
+        }
+      }
+    } catch {}
+
     console.log("Payment successful!");
     // Generate pickup code
     const generatedCode = generatePickupCode();
@@ -115,7 +164,6 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
     try {
       // Format pickup time
       const pickupDateTime = `${today}T${pickupHour.padStart(2, "0")}:${pickupMinute.padStart(2, "0")}:00`;
-      
       // Create order in the backend - format items as strings to match the schema
       const orderResponse = await fetch("http://localhost:3000/api/orders", {
         method: "POST",
@@ -124,7 +172,6 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
           "X-Requested-With": "XMLHttpRequest"
         },
         body: JSON.stringify({
-          // Format items as simple strings to match the model's expectations
           items: cart.map(item => `${item.name} (${item.price} Ft)`),
           pickupCode: generatedCode,
           pickupTime: pickupDateTime,
@@ -136,20 +183,20 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
 
       if (!orderResponse.ok) {
         const errorData = await orderResponse.json();
-        throw new Error(`Failed to create order: ${errorData.message || orderResponse.statusText}`);
+        setPaymentError(errorData.message || orderResponse.statusText);
+        setPaymentStatus('error');
+        setIsProcessingPayment(false);
+        return;
       }
 
-      console.log("Order created successfully");
-      
       // Update UI state
       setPickupCode(generatedCode);
       setPaymentStatus('success');
       setIsProcessingPayment(false);
     } catch (error) {
       console.error("Error creating order:", error);
-      // Still show success to user since payment worked, but log the error
-      setPickupCode(generatedCode);
-      setPaymentStatus('success');
+      setPaymentError('Hiba történt a rendelés létrehozásakor. Kérjük, próbáld újra!');
+      setPaymentStatus('error');
       setIsProcessingPayment(false);
     }
   };
@@ -167,6 +214,18 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
     setPaymentError(null);
     setIsProcessingPayment(false);
     onClearCart();
+  };
+
+  const handleAcceptEmail = () => {
+    setEmailCheckError(null);
+    const token = localStorage.getItem("accessToken");
+    const isLoggedIn = !!token;
+    if (!isLoggedIn && registeredEmails.includes(email.toLowerCase())) {
+      setEmailCheckError("Ez az email regisztrált felhasználóhoz vagy büféhez tartozik. Kérjük, jelentkezz be a rendeléshez.");
+      return;
+    }
+    setEmailAccepted(true);
+    setEditingEmail(false);
   };
 
   const currentStep = getCurrentStep(cart, cartAccepted, emailAccepted, editingEmail, isPickupValid && pickupAccepted, paymentStatus === 'success');
@@ -282,11 +341,14 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
                 <button
                   className="px-4 py-2 bg-[var(--primary)] text-white rounded disabled:opacity-50 transition"
                   disabled={!isEmailValid}
-                  onClick={() => { setEmailAccepted(true); setEditingEmail(false); }}
+                  onClick={handleAcceptEmail}
                 >Elfogad</button>
               </div>
               {!isEmailValid && email && (
                 <div className="text-xs text-red-500 mt-1">Adj meg egy érvényes email címet.</div>
+              )}
+              {emailCheckError && (
+                <div className="text-xs text-red-500 mt-1">{emailCheckError}</div>
               )}
             </div>
           )}

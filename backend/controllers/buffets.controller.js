@@ -15,6 +15,15 @@ export const getBuffetById = async (req, res) => {
   res.json(buffet);
 };
 
+export const getPublicBuffets = async (req, res) => {
+  try {
+    // Exclude password and email from the returned buffets
+    const buffets = await Buffet.find({}, '-password -email');
+    res.json(buffets);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const buffetLogin = async (req, res) => {
   try {

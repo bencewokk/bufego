@@ -1,6 +1,8 @@
 import Order from "../models/order.model.js";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import Buffet from "../models/buffet.model.js";
+import { Users } from "../models/user.model.js";
 
 const ENCRYPTION_KEY = process.env.EMAIL_ENCRYPTION_KEY || 'default_key_32_bytes_long_123456'; // Must be 32 bytes for aes-256
 const IV_LENGTH = 16;
@@ -26,6 +28,26 @@ function decrypt(text) {
 export const createOrder = async (req, res) => {
     try {
         const { items, pickupCode, pickupTime, email } = req.body;
+
+        // LOGGING: Incoming order details
+        console.log('--- Incoming Order ---');
+        console.log('Email:', email);
+        console.log('req.user:', req.user);
+
+        // Check if email belongs to a registered user or buffet
+        if (email) {
+            const user = await Users.findOne({ email: email.toLowerCase() });
+            const buffet = await Buffet.findOne({ email: email.toLowerCase() });
+            // LOGGING: Lookup results
+            console.log('User found:', !!user);
+            console.log('Buffet found:', !!buffet);
+            // If email is registered and request is unauthenticated, reject
+            if ((user || buffet) && !req.user) {
+                console.log('Order rejected: Registered email used while unauthenticated');
+                return res.status(403).json({ message: "Registered users/buffets must log in to order with this email." });
+            }
+        }
+
         const encryptedEmail = email ? encrypt(email) : undefined;
         const order = new Order({ items, pickupCode, pickupTime, email: encryptedEmail });
         await order.save();

@@ -176,3 +176,19 @@ export const uploadBuffetImage = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getAllEmails = async (req, res) => {
+  try {
+    // Get all user emails
+    const users = await Users.find({}, { email: 1, _id: 0 });
+    // Get all buffet emails
+    const buffets = await Buffet.find({}, { email: 1, _id: 0 });
+    // Combine and deduplicate emails
+    const userEmails = users.map(u => u.email.toLowerCase());
+    const buffetEmails = buffets.map(b => b.email.toLowerCase());
+    const allEmails = Array.from(new Set([...userEmails, ...buffetEmails]));
+    res.status(200).json({ emails: allEmails });
+  } catch (error) {
+    res.status(500).json({ message: "Szerver hiba: " + error.message });
+  }
+};

@@ -3,7 +3,8 @@ import { authenticate } from "../middleware/auth.middleware.js";
 import { isBuffet } from "../middleware/buffets.middleware.js";
 import { 
   buffetLogin, getBuffets, getBuffetById, addBuffet, updateBuffet, deleteBuffet,
-  getBuffetInventory, updateBuffetInventory, addInventoryItem, removeInventoryItem, toggleItemAvailability, updateInventoryItem
+  getBuffetInventory, updateBuffetInventory, addInventoryItem, removeInventoryItem, toggleItemAvailability, updateInventoryItem,
+  getPublicBuffets
 } from "../controllers/buffets.controller.js";
 
 const router = express.Router();
@@ -15,6 +16,9 @@ router.put("/update/:id", authenticate, updateBuffet);
 router.delete("/delete/:id", authenticate, deleteBuffet);
 
 router.post("/login", buffetLogin);
+
+// Public route
+router.get("/public", getPublicBuffets);
 
 // Inventory routes
 router.get("/inventory/:id", getBuffetInventory);
