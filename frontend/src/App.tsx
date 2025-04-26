@@ -10,6 +10,8 @@ import { BuffetDashboard } from "./pages/buffetDashboard/_buffetDashboard";
 import { BuffetDetails } from "./pages/buffets/_details";
 import BuffetTouch from "./pages/buffetDashboard/touch/_buffetTouch"; 
 import { About } from "./components/landing/About";
+import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute";
+import UserDashboard from "./pages/user/_dashboard";
 
 function App() {
   return (
@@ -21,10 +23,15 @@ function App() {
         <Route path="/signup" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/buffet-login" element={<BuffetLoginPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={
+          <ProtectedAdminRoute>
+            <AdminDashboard />
+          </ProtectedAdminRoute>
+        } />
         <Route path="/buffet-dashboard" element={<BuffetDashboard />} />
         <Route path="/buffet-dashboard/touch" element={<BuffetTouch />} />
         <Route path="/buffet/:id" element={<BuffetDetails />} />
+        <Route path="/user-dashboard" element={<UserDashboard />} />
       </Routes>
     </BrowserRouter>
   );

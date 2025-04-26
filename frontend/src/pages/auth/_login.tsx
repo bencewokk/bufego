@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
 import logoImage from '../../assets/bufego.png';
 import { GeometricBackground } from "../../components/design/GeometricBackground";
 
@@ -29,7 +30,17 @@ export const LoginPage = () => {
       success: (res) => {
         const token = res.data.token;
         localStorage.setItem("accessToken", token);
-        window.location.href = "/admin";
+        let role = "user";
+        try {
+          const decoded = jwtDecode(token);
+          // @ts-ignore
+          role = decoded.role || "user";
+        } catch (e) {}
+        if (role === "admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/";
+        }
         return <b>Sikeresen bejelentkeztél!</b>;
       },
       error: (err) => {
