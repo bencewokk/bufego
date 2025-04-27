@@ -42,6 +42,15 @@ const DashboardCharts: FC<DashboardChartsProps> = ({ inventory }) => {
     fetchOrders();
   }, []);
 
+  // Helper to get total for an order
+  const getOrderTotal = (order: any) => {
+    if (!order.items || !Array.isArray(order.items)) return 0;
+    return order.items.reduce((sum: number, itemName: string) => {
+      const item = inventory.find((inv) => inv.name === itemName);
+      return sum + (item && item.price ? item.price : 0);
+    }, 0);
+  };
+
   // Generate date labels and data points based on selected timeframe
   const getPeriodData = () => {
     let days: Date[];
@@ -81,7 +90,7 @@ const DashboardCharts: FC<DashboardChartsProps> = ({ inventory }) => {
           const date = new Date(o.createdAt);
           return date.toDateString() === day.toDateString();
         })
-        .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+        .reduce((sum, order) => sum + getOrderTotal(order), 0);
     });
 
     return { labels, orderCounts, revenue };
@@ -91,7 +100,7 @@ const DashboardCharts: FC<DashboardChartsProps> = ({ inventory }) => {
 
   // Calculate summary stats
   const totalOrders = orders.length;
-  const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+  const totalRevenue = orders.reduce((sum, order) => sum + getOrderTotal(order), 0);
   const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
   // Get data for line chart based on selected metric
