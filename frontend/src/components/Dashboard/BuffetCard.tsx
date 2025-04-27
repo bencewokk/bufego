@@ -32,7 +32,7 @@ export const BuffetCard: React.FC<BuffetCardProps> = ({
 }) => {
   return (
     <div className="bg-[var(--admin-surface)] rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative">
-      <Link to={`/admin/buffet/${buffet.id}`}>
+      <Link to={`/buffet/${buffet.id}`}>
         <div className="h-48 bg-gray-200 relative">
           <div className="absolute bottom-0 left-0 bg-[var(--admin-primary)] text-white px-3 py-1 rounded-tr-lg">
             <FontAwesomeIcon icon={faClock} className="mr-2" />
