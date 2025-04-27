@@ -67,6 +67,17 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
   const isPickupValid = pickupHour !== "" && pickupMinute !== "";
   const isEmailValid = email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 
+  // Determine if user is logged in and get their email from JWT
+  const token = localStorage.getItem("accessToken");
+  let loggedInEmail: string | null = null;
+  try {
+    if (token) {
+      const decoded = jwtDecode(token);
+      // @ts-ignore
+      loggedInEmail = decoded.email || decoded.username || null;
+    }
+  } catch {}
+
   useEffect(() => {
     const now = new Date();
     let pickup = new Date(now.getTime() + 15 * 60000);
@@ -133,6 +144,23 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
     }
   }, [email, registeredEmails]);
 
+  // When user is logged in, always use their email for the order and auto-accept
+  useEffect(() => {
+    if (loggedInEmail) {
+      setEmail(loggedInEmail);
+      setEmailAccepted(true);
+      setEditingEmail(false);
+    }
+  }, [loggedInEmail]);
+
+  // Skip email step if logged in and email is accepted
+  useEffect(() => {
+    if (loggedInEmail && cartAccepted && !emailAccepted) {
+      setEmailAccepted(true);
+      setEditingEmail(false);
+    }
+  }, [loggedInEmail, cartAccepted, emailAccepted]);
+
   const handlePaymentSuccess = async () => {
     if (!email || !isEmailValid) {
       setEmailAccepted(false);
@@ -165,12 +193,14 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
       // Format pickup time
       const pickupDateTime = `${today}T${pickupHour.padStart(2, "0")}:${pickupMinute.padStart(2, "0")}:00`;
       // Create order in the backend - format items as strings to match the schema
+      const authToken = localStorage.getItem("accessToken");
+      console.log("[ORDER SUBMIT] Sending token:", authToken);
       const orderResponse = await fetch("http://localhost:3000/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-Requested-With": "XMLHttpRequest",
-          ...(localStorage.getItem("accessToken") && { Authorization: `Bearer ${localStorage.getItem("accessToken")}` })
+          ...(authToken && { Authorization: `Bearer ${authToken}` })
         },
         body: JSON.stringify({
           items: cart.map(item => `${item.name} (${item.price} Ft)`),
@@ -184,7 +214,18 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
 
       if (!orderResponse.ok) {
         const errorData = await orderResponse.json();
-        setPaymentError(errorData.message || orderResponse.statusText);
+        let userMessage = errorData.message || orderResponse.statusText;
+        // Custom user-friendly error for forbidden order
+        if (orderResponse.status === 403) {
+          if (email && registeredEmails.includes(email.toLowerCase())) {
+            userMessage =
+              "Ez az email regisztrált felhasználóhoz vagy büféhez tartozik. Kérjük, jelentkezz be a rendeléshez, és használd a saját email címed!";
+          } else {
+            userMessage =
+              "Nincs jogosultságod a rendelés leadásához. Kérjük, jelentkezz be, vagy használj másik email címet.";
+          }
+        }
+        setPaymentError(userMessage);
         setPaymentStatus('error');
         setIsProcessingPayment(false);
         return;
@@ -323,7 +364,7 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
           )}
 
           {/* Email Step */}
-          {cart.length > 0 && cartAccepted && (!emailAccepted || editingEmail) && (
+          {cart.length > 0 && cartAccepted && (!emailAccepted || editingEmail) && !loggedInEmail && (
             <div className="bg-white rounded-lg p-4 border border-gray-100 mb-6">
               <div className="flex items-center mb-2">
                 <FontAwesomeIcon icon={faCreditCard} className="text-[var(--primary)] text-lg mr-3" />

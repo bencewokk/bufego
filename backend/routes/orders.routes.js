@@ -1,11 +1,11 @@
 import express from "express";
 import { createOrder, getOrders, updateOrderStatus, getOrderByPickupCode, getMyOrders, getBuffetOrders } from "../controllers/orders.controller.js";
-import { authenticate, requireBuffet } from "../middleware/auth.middleware.js";
+import { optionalAuthenticate, authenticate, requireBuffet } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-// Protect order placement with authentication
-router.post("/", authenticate, createOrder);
+// Allow guest or authenticated order placement: req.user set if token present
+router.post("/", optionalAuthenticate, createOrder);
 
 // (Optional) If you want to secure the GET orders endpoint, you can keep authentication here.
 // router.get("/", authenticate, getOrders);

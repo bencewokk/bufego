@@ -39,16 +39,23 @@ export const createOrder = async (req, res) => {
         console.log('req.user:', req.user);
 
         // Check if email belongs to a registered user or buffet
+        let user = null;
+        let buffet = null;
         if (email) {
-            const user = await Users.findOne({ email: email.toLowerCase() });
-            const buffet = await Buffet.findOne({ email: email.toLowerCase() });
-            // LOGGING: Lookup results
+            user = await Users.findOne({ email: email.toLowerCase() });
+            buffet = await Buffet.findOne({ email: email.toLowerCase() });
             console.log('User found:', !!user);
             console.log('Buffet found:', !!buffet);
-            // If email is registered and request is unauthenticated, reject
-            if ((user || buffet) && !req.user) {
-                console.log('Order rejected: Registered email used while unauthenticated');
-                return res.status(403).json({ message: "Registered users/buffets must log in to order with this email." });
+            // If email is registered, require authentication and email match
+            if ((user || buffet)) {
+                if (!req.user) {
+                    console.log('Order rejected: Registered email used while unauthenticated');
+                    return res.status(403).json({ message: "Registered users/buffets must log in to order with this email." });
+                }
+                if (req.user.email.toLowerCase() !== email.toLowerCase()) {
+                    console.log('Order rejected: Authenticated user email does not match order email');
+                    return res.status(403).json({ message: "You must order with your own email address." });
+                }
             }
         }
 
