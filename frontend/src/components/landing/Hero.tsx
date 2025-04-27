@@ -70,12 +70,14 @@ export const Hero = () => {
         {[...Array(12)].map((_, i) => (
           <div
             key={i}
-            className={`absolute w-2 h-2 bg-white rounded-full animate-[float_${6 + i % 5}s_ease-in-out_infinite]`}
+            className={`absolute w-2 h-2 bg-white rounded-full animate-[float_${
+              6 + (i % 5)
+            }s_ease-in-out_infinite]`}
             style={{
               left: `${10 + Math.random() * 80}%`,
               top: `${10 + Math.random() * 80}%`,
               animationDelay: `${i * 0.5}s`,
-              opacity: 0.3 + Math.random() * 0.3
+              opacity: 0.3 + Math.random() * 0.3,
             }}
           />
         ))}
@@ -101,44 +103,41 @@ export const Hero = () => {
               Gyors és egyszerű étkezés az iskoládban
             </h1>
             <p className="text-lg md:text-xl text-white mb-6">
-              Keresd meg a legjobb büféket, nézd meg a menüt és rendelj előre - 
+              Keresd meg a legjobb büféket, nézd meg a menüt és rendelj előre -
               minden egy helyen!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 flex-wrap sm:flex-nowrap">
               <button
                 type="button"
                 className="bg-white text-[var(--primary)] px-6 py-3 rounded-full font-medium text-center hover:bg-gray-100 transition-colors border-2 border-white"
-                onClick={() => { setShowOrderModal(true); setSubmittedCode(""); setPickupCode(""); }}
-                style={{whiteSpace: 'nowrap'}}
+                onClick={() => {
+                  setShowOrderModal(true);
+                  setSubmittedCode("");
+                  setPickupCode("");
+                }}
+                style={{ whiteSpace: "nowrap" }}
               >
                 Rendelés követése
               </button>
-              <a 
-                href="/signup" 
+              <a
+                href="/about"
                 className="border-2 border-white text-white px-6 py-3 rounded-full font-medium text-center hover:bg-white/10 transition-colors"
-                style={{whiteSpace: 'nowrap'}}
-              >
-                Regisztráció
-              </a>
-              <a 
-                href="/about" 
-                className="border-2 border-white text-white px-6 py-3 rounded-full font-medium text-center hover:bg-white/10 transition-colors"
-                style={{whiteSpace: 'nowrap'}}
+                style={{ whiteSpace: "nowrap" }}
               >
                 Tudj meg többet
               </a>
-              <a 
-                href="/buffet-login" 
+              <a
+                href="/buffet-login"
                 className="border-2 border-white text-white px-6 py-3 rounded-full font-medium text-center hover:bg-white/10 transition-colors"
-                style={{whiteSpace: 'nowrap'}}
+                style={{ whiteSpace: "nowrap" }}
               >
                 Van már büféd?
               </a>
             </div>
           </div>
           <div className="w-full md:w-2/5 flex justify-center items-center mt-8 md:mt-0">
-            <a 
-              href="/buffets" 
+            <a
+              href="/buffets"
               className="bg-white text-[var(--primary)] px-10 py-6 rounded-lg shadow-md 
                         font-bold text-xl md:text-2xl uppercase tracking-wide transition-all 
                         hover:shadow-lg hover:translate-y-1 flex items-center justify-center
@@ -163,19 +162,23 @@ export const Hero = () => {
             </button>
             {!submittedCode ? (
               <form
-                onSubmit={e => {
+                onSubmit={(e) => {
                   e.preventDefault();
                   if (pickupCode.trim()) setSubmittedCode(pickupCode.trim());
                 }}
               >
-                <h2 className="text-xl font-bold mb-4 text-[var(--primary)]">Rendelés követése</h2>
-                <label className="block mb-2 text-sm font-medium text-gray-700">Átvételi kód</label>
+                <h2 className="text-xl font-bold mb-4 text-[var(--primary)]">
+                  Rendelés követése
+                </h2>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  Átvételi kód
+                </label>
                 <input
                   type="text"
                   className="border p-2 rounded w-full mb-4"
                   placeholder="Írd be az átvételi kódod..."
                   value={pickupCode}
-                  onChange={e => setPickupCode(e.target.value)}
+                  onChange={(e) => setPickupCode(e.target.value)}
                   autoFocus
                 />
                 <button
@@ -187,7 +190,10 @@ export const Hero = () => {
                 </button>
               </form>
             ) : (
-              <OrderStatusTracker pickupCode={submittedCode} onClose={() => setShowOrderModal(false)} />
+              <OrderStatusTracker
+                pickupCode={submittedCode}
+                onClose={() => setShowOrderModal(false)}
+              />
             )}
           </div>
         </div>
