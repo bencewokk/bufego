@@ -58,7 +58,7 @@ export const HowItWorks = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl p-2 font-extrabold mb-4 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] bg-clip-text text-transparent">
             Hogyan működik?
           </h2>
           <p className="text-lg text-[var(--text)] mb-12 max-w-3xl mx-auto leading-relaxed opacity-90">
