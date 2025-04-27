@@ -7,6 +7,7 @@ import { BuffetDetails } from "../../components/buffetDashboard/BuffetDetails";
 import { BuffetImage } from "../../components/buffetDashboard/BuffetImage";
 import { InventoryManagement } from "../../components/buffetDashboard/InventoryManagement";
 import { BuffetOrderHistoryIsland } from "../../components/buffetDashboard/BuffetOrderHistoryIsland.tsx";
+import DashboardCharts from "../../components/buffetDashboard/DashboardCharts";
 import { Buffet, InventoryItem } from "../../types";
 
 export const BuffetDashboard = () => {
@@ -102,6 +103,7 @@ export const BuffetDashboard = () => {
           Érintős nézet
         </button>
         
+        <DashboardCharts inventory={inventory} />
         <InventoryManagement 
           buffet={buffet}
           inventory={inventory}
