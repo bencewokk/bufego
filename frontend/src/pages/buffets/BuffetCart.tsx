@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart, faCreditCard } from "@fortawesome/free-solid-svg-icons";
 import { InventoryItem } from "../../types";
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import StripePaymentForm from "./StripePaymentForm";
 import OrderConfirmation from "../../components/buffets/OrderConfirmation";
 import CartItem from "../../components/buffets/CartItem";
 import CartStepIndicator from "../../components/buffets/CartStepIndicator";
@@ -23,9 +20,6 @@ interface BuffetCartProps {
   buffetId: string;
   onClearCart: () => void;
 }
-
-const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_51H59owJmQoVhz82aWAoi9M5s8PC6sSAqFI7KfAD2NRKun5riDIOM0dvu2caM25a5f5JbYLMc5Umxw8Dl7dBIDNwM00yVbSX8uS";
-const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 // Update step logic
 function getCurrentStep(cart: InventoryItem[], cartAccepted: boolean, emailAccepted: boolean, editingEmail: boolean, isPickupValid: boolean, paymentSuccess: boolean) {
@@ -270,11 +264,41 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
     setEditingEmail(false);
   };
 
-  const currentStep = getCurrentStep(cart, cartAccepted, emailAccepted, editingEmail, isPickupValid && pickupAccepted, paymentStatus === 'success');
+  const handleStripeCheckout = async () => {
+    setIsProcessingPayment(true);
+    setPaymentError(null);
+    try {
+      const response = await fetch("http://localhost:3000/api/payments/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: JSON.stringify({
+          cart: cart.map(item => ({
+            name: item.name,
+            price: item.price,
+            quantity: 1, // or use item.quantity if available
+          })),
+          currency: "HUF",
+        }),
+      });
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setPaymentError(data.error || "Nem sikerült elindítani a fizetést.");
+        setPaymentStatus('error');
+        setIsProcessingPayment(false);
+      }
+    } catch (err) {
+      setPaymentError("Hálózati hiba vagy szerverhiba történt.");
+      setPaymentStatus('error');
+      setIsProcessingPayment(false);
+    }
+  };
 
-  if (!stripePromise) {
-    return <div>Hiba: Stripe nincs konfigurálva. Ellenőrizd a VITE_STRIPE_PUBLISHABLE_KEY környezeti változót.</div>;
-  }
+  const currentStep = getCurrentStep(cart, cartAccepted, emailAccepted, editingEmail, isPickupValid && pickupAccepted, paymentStatus === 'success');
 
   return (
     <div className="flex">
@@ -433,16 +457,13 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
                   </button>
                 </div>
               ) : (
-                <Elements stripe={stripePromise}>
-                  <StripePaymentForm
-                    total={total}
-                    cart={cart}
-                    onPaymentSuccess={handlePaymentSuccess}
-                    onPaymentError={handlePaymentError}
-                    ordering={isProcessingPayment}
-                    currency="HUF"
-                  />
-                </Elements>
+                <button
+                  className="w-full px-4 py-3 bg-primary text-white rounded-md font-medium transition-colors cursor-pointer hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  onClick={handleStripeCheckout}
+                  disabled={isProcessingPayment}
+                >
+                  {isProcessingPayment ? 'Fizetés indítása...' : `Fizetés Stripe Checkout-on keresztül (${total} Ft)`}
+                </button>
               )}
             </div>
           )}

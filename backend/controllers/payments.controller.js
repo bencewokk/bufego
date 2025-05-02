@@ -125,3 +125,36 @@ export const refreshPaymentIntent = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Add Stripe Checkout session creation
+export const createCheckoutSession = async (req, res) => {
+  try {
+    const { cart, currency = "huf", successUrl, cancelUrl } = req.body;
+    if (!cart || !Array.isArray(cart) || cart.length === 0) {
+      return res.status(400).json({ error: "Cart is required and cannot be empty" });
+    }
+    // Map cart items to Stripe line items
+    const line_items = cart.map(item => ({
+      price_data: {
+        currency: currency.toLowerCase(),
+        product_data: { name: item.name },
+        unit_amount: Math.round(item.price * 100),
+      },
+      quantity: item.quantity || 1,
+    }));
+    // Fallback URLs if not provided
+    const defaultSuccess = "http://localhost:5173/payment-success";
+    const defaultCancel = "http://localhost:5173/payment-cancel";
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items,
+      mode: "payment",
+      success_url: successUrl || defaultSuccess,
+      cancel_url: cancelUrl || defaultCancel,
+    });
+    res.json({ url: session.url });
+  } catch (error) {
+    console.error('Stripe Checkout error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
