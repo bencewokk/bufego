@@ -62,7 +62,7 @@ export const AddItemForm: FC<AddItemFormProps> = ({
             type="text"
             value={newItem.name}
             onChange={(e) => setNewItem({...newItem, name: e.target.value})}
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 focus:border-transparent outline-none transition-all hover:border-gray-400"
             placeholder="Pl. Sonkás szendvics"
           />
         </div>
@@ -71,8 +71,8 @@ export const AddItemForm: FC<AddItemFormProps> = ({
           <select
             value={newItem.category}
             onChange={(e) => setNewItem({...newItem, category: e.target.value})}
-            className="w-full p-2 border rounded"
-          >
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 focus:border-transparent outline-none transition-all hover:border-gray-400"
+            >
             <option value="Egyéb">Egyéb</option>
             <option value="Szendvics">Szendvics</option>
             <option value="Meleg étel">Meleg étel</option>
@@ -87,7 +87,7 @@ export const AddItemForm: FC<AddItemFormProps> = ({
             min="0"
             value={newItem.price}
             onChange={e => setNewItem({...newItem, price: Number(e.target.value)})}
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 focus:border-transparent outline-none transition-all hover:border-gray-400"
             placeholder="Pl. 500"
           />
         </div>
@@ -96,7 +96,7 @@ export const AddItemForm: FC<AddItemFormProps> = ({
           <select
             value={newItem.available ? "true" : "false"}
             onChange={(e) => setNewItem({...newItem, available: e.target.value === "true"})}
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-400 focus:border-transparent outline-none transition-all hover:border-gray-400"
           >
             <option value="true">Elérhető</option>
             <option value="false">Nem elérhető</option>
@@ -105,7 +105,7 @@ export const AddItemForm: FC<AddItemFormProps> = ({
       </div>
       <button
         onClick={handleAddItem}
-        className="mt-4 px-4 py-2 bg-[var(--primary)] text-white rounded hover:bg-[var(--primary-dark)] transition"
+        className="mt-4 px-4 py-2 bg-[var(--primary)] text-white rounded hover:bg-[var(--primary-dark)] transition cursor-pointer"
       >
         Hozzáadás
       </button>

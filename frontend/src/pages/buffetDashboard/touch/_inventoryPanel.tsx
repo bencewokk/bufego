@@ -11,9 +11,10 @@ interface InventoryPanelProps {
   setSelectedCategory: (category: string) => void;
   orders: Order[]; // Add orders prop
   onToggleAvailability: (itemId: string) => void;
+  itemPurchases: {};
 }
 
-const InventoryPanel = ({ inventory, selectedCategory, setSelectedCategory, orders = [], onToggleAvailability }: InventoryPanelProps) => {
+const InventoryPanel = ({ inventory, selectedCategory, setSelectedCategory, orders = [], onToggleAvailability, itemPurchases }: InventoryPanelProps) => {
   // --- Calculate Preparing Orders ---
   const preparingOrdersCount: Record<string, number> = orders
     .filter(order => order.status === "preparing") // Only include "preparing" orders

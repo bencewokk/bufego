@@ -1,4 +1,3 @@
-// _buffetDashboard.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -70,20 +69,20 @@ export const BuffetDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        Loading...
+        Beltöltés...
       </div>
     );
   }
 
   if (!buffet) {
-    return <div>Error loading buffet details.</div>;
+    return <div>Sikertelen betöltés.</div>;
   }
 
   return (
     <div>
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-4">Buffet Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-4">Büfé</h1>
         
         <div className="bg-white p-6 rounded-lg shadow mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -98,7 +97,7 @@ export const BuffetDashboard = () => {
         
         <button
           onClick={() => navigate("/buffet-dashboard/touch")}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition cursor-pointer"
         >
           Érintős nézet
         </button>
