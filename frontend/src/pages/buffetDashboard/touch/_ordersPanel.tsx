@@ -17,18 +17,15 @@ const OrdersPanel = ({
   updateOrderStatus,
   NEW_ORDER_THRESHOLD_MS,
 }: OrdersPanelProps) => {
-  // --- Use state to hold real orders fetched from the backend ---
   const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/orders");
-        // Convert pickupTime and createdAt from strings to Date objects,
-        // and assign _id to id so that each order has a unique identifier.
         const convertedOrders: Order[] = response.data.map((order: any) => ({
           ...order,
-          id: order._id, // Ensure a unique id is set from _id
+          id: order._id,
           pickupTime: new Date(order.pickupTime),
           createdAt: new Date(order.createdAt),
         }));
@@ -191,7 +188,7 @@ const OrdersPanel = ({
             >
               {isNew && (
                 <span className="absolute top-2 right-2 bg-pink-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow z-10">
-                  NEW
+                  ÚJ
                 </span>
               )}
 

@@ -26,7 +26,7 @@ export const InventoryManagement: FC<InventoryManagementProps> = ({
         <h2 className="text-xl font-semibold">Kínálat kezelése</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-3 py-1 bg-[var(--primary)] text-white rounded hover:bg-[var(--primary-dark)] transition"
+          className="px-3 py-1 bg-[var(--primary)] text-white rounded hover:bg-[var(--primary-dark)] transition cursor-pointer"
         >
           {showAddForm ? 'Mégse' : 'Új tétel hozzáadása'}
         </button>

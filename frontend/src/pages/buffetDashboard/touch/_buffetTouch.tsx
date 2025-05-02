@@ -161,6 +161,7 @@ const BuffetTouch = () => {
         />
         <InventoryPanel
           inventory={inventory}
+          orders={orders}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           itemPurchases={itemPurchases}
