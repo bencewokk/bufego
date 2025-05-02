@@ -148,13 +148,10 @@ const BuffetTouch = () => {
     fetchBuffetData();
   }, []);
 
-  // --- Render the Child Components ---
-  // Pass necessary props to the panels.
   return (
     <div className="h-screen w-screen flex flex-col bg-gray-100 font-sans">
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 overflow-hidden">
         <OrdersPanel
-          orders={orders}
           currentTime={currentTime}
           updateOrderStatus={updateOrderStatus}
           NEW_ORDER_THRESHOLD_MS={NEW_ORDER_THRESHOLD_MS}
