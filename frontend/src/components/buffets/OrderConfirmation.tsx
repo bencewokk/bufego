@@ -45,8 +45,8 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ pickupCode, buffe
         <div className="p-2">
           <button
             onClick={() => setShowTracker(false)}
-            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Back to confirmation"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+            aria-label="Vissza a megerősítéshez"
           >
             <FontAwesomeIcon icon={faTimes} size="lg" />
           </button>
@@ -56,8 +56,8 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ pickupCode, buffe
         <>
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Close confirmation"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+            aria-label="Információk bezárása"
           >
             <FontAwesomeIcon icon={faTimes} size="lg" />
           </button>
@@ -84,7 +84,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ pickupCode, buffe
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
             <button
               onClick={() => setShowTracker(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors flex items-center justify-center"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors flex items-center justify-center cursor-pointer"
             >
               <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
               Rendelés Követése
@@ -93,7 +93,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ pickupCode, buffe
             {!notificationsEnabled && Notification && Notification.permission !== "denied" && (
               <button
                 onClick={handleEnableNotifications}
-                className="px-4 py-2 bg-amber-500 text-white rounded-md font-medium hover:bg-amber-600 transition-colors flex items-center justify-center"
+                className="px-4 py-2 bg-amber-500 text-white rounded-md font-medium hover:bg-amber-600 transition-colors flex items-center justify-center cursor-pointer"
               >
                 <FontAwesomeIcon icon={faBell} className="mr-2" />
                 Értesítések Engedélyezése
@@ -103,7 +103,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ pickupCode, buffe
 
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary-dark transition-colors"
+            className="px-6 py-2 bg-amber-500 text-white rounded-md font-medium hover:bg-amber-600 transition-colors cursor-pointer"
           >
             Bezárás és Kosár Ürítése
           </button>

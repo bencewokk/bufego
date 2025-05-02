@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import {
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import { InventoryItem } from "../../types";
 
 interface StripePaymentFormProps {
@@ -17,7 +23,7 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   onPaymentSuccess,
   onPaymentError,
   ordering,
-  currency = "HUF"
+  currency = "HUF",
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -37,10 +43,10 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   }, [stripe, elements]);
 
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('hu-HU', {
-      style: 'currency',
+    return new Intl.NumberFormat("hu-HU", {
+      style: "currency",
       currency: currency,
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -59,7 +65,8 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     setCardCvcError(event.error ? event.error.message : null);
   };
 
-  const allCardFieldsComplete = cardNumberComplete && cardExpiryComplete && cardCvcComplete;
+  const allCardFieldsComplete =
+    cardNumberComplete && cardExpiryComplete && cardCvcComplete;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,22 +86,25 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
 
     try {
       // Always create a new PaymentIntent right before confirmation
-      const response = await fetch("http://localhost:3000/api/payments/create-payment-intent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest"
-        },
-        body: JSON.stringify({
-          amount: total,
-          currency: currency.toLowerCase(),
-          cart: cart.map(item => ({
-            name: item.name,
-            price: item.price,
-            quantity: 1 // Assuming quantity is always 1 per cart item for payment intent
-          })),
-        })
-      });
+      const response = await fetch(
+        "http://localhost:3000/api/payments/create-payment-intent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          body: JSON.stringify({
+            amount: total,
+            currency: currency.toLowerCase(),
+            cart: cart.map((item) => ({
+              name: item.name,
+              price: item.price,
+              quantity: 1, // Assuming quantity is always 1 per cart item for payment intent
+            })),
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -106,7 +116,9 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
 
       if (!clientSecret) {
         console.error("Backend did not return a client secret.", data); // Log the response data
-        throw new Error("Failed to retrieve payment client secret from server.");
+        throw new Error(
+          "Failed to retrieve payment client secret from server."
+        );
       }
 
       console.log("Received clientSecret:", clientSecret); // Log the client secret
@@ -122,8 +134,8 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
           card: cardNumberElement,
           billing_details: {
             // Add billing details if needed/collected
-          }
-        }
+          },
+        },
       });
 
       if (paymentResult.error) {
@@ -133,7 +145,9 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
       if (paymentResult.paymentIntent?.status === "succeeded") {
         onPaymentSuccess();
       } else {
-        throw new Error(`Payment status: ${paymentResult.paymentIntent?.status || "unknown"}`);
+        throw new Error(
+          `Payment status: ${paymentResult.paymentIntent?.status || "unknown"}`
+        );
       }
     } catch (err: any) {
       const errorMessage = err.message || "Payment processing error";
@@ -155,15 +169,15 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
         fontSmoothing: "antialiased",
         fontSize: "16px",
         "::placeholder": {
-          color: "#aab7c4"
-        }
+          color: "#aab7c4",
+        },
       },
       invalid: {
         color: "#fa755a",
-        iconColor: "#fa755a"
-      }
+        iconColor: "#fa755a",
+      },
     },
-    hidePostalCode: true
+    hidePostalCode: true,
   };
 
   return (
@@ -175,43 +189,62 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
         <div className="space-y-3">
           <div>
             <label className="text-xs text-gray-600">Kártyaszám</label>
-            <div className="p-2 border rounded-md bg-white focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+            <div className="p-2 rounded-md bg-white">
               <CardNumberElement
                 options={CARD_ELEMENT_OPTIONS}
                 onChange={handleCardNumberChange}
-                className="w-full"
-              />
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
+                />
             </div>
-            {cardNumberError && <div className="text-red-600 text-xs mt-1">{cardNumberError}</div>}
+            {cardNumberError && (
+              <div className="text-red-600 text-xs mt-1">{cardNumberError}</div>
+            )}
           </div>
           <div className="flex gap-2">
             <div className="flex-1">
               <label className="text-xs text-gray-600">Lejárat</label>
-              <div className="p-2 border rounded-md bg-white focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+              <div className="p-2 rounded-md bg-white">
                 <CardExpiryElement
                   options={CARD_ELEMENT_OPTIONS}
                   onChange={handleCardExpiryChange}
-                  className="w-full"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
                 />
               </div>
-              {cardExpiryError && <div className="text-red-600 text-xs mt-1">{cardExpiryError}</div>}
+              {cardExpiryError && (
+                <div className="text-red-600 text-xs mt-1">
+                  {cardExpiryError}
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <label className="text-xs text-gray-600">CVC</label>
-              <div className="p-2 border rounded-md bg-white focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+              <div className="p-2 rounded-md bg-white">
                 <CardCvcElement
                   options={CARD_ELEMENT_OPTIONS}
                   onChange={handleCardCvcChange}
-                  className="w-full"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
                 />
               </div>
-              {cardCvcError && <div className="text-red-600 text-xs mt-1">{cardCvcError}</div>}
+              {cardCvcError && (
+                <div className="text-red-600 text-xs mt-1">{cardCvcError}</div>
+              )}
             </div>
           </div>
           {error && (
             <div className="mt-2 text-red-600 text-sm flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
               </svg>
               {error}
             </div>
@@ -226,17 +259,37 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
 
       <button
         type="submit"
-        disabled={!isClientReady || ordering || processing || !allCardFieldsComplete}
-        className="w-full px-4 py-3 bg-primary text-white rounded-md font-medium transition-colors 
+        disabled={
+          !isClientReady || ordering || processing || !allCardFieldsComplete
+        }
+        className="w-full px-4 py-3 bg-primary text-white rounded-md font-medium transition-colors cursor-pointer
                  hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
                  disabled:bg-gray-400 disabled:cursor-not-allowed"
-        aria-label={processing ? "Processing payment" : `Pay ${formatCurrency(total)}`}
+        aria-label={
+          processing ? "Processing payment" : `Pay ${formatCurrency(total)}`
+        }
       >
         {processing ? (
           <span className="flex items-center justify-center">
-            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
             Feldolgozás...
           </span>
@@ -247,8 +300,19 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
 
       <div className="mt-2 flex justify-center text-xs text-gray-500">
         <div className="flex items-center space-x-1">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
           </svg>
           <span>Biztonságos fizetés SSL-titkosítással</span>
         </div>

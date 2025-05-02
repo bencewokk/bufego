@@ -25,8 +25,8 @@ const CartItem: React.FC<CartItemProps> = ({ item, removeFromCart }) => {
       </div>
       <button
         onClick={() => removeFromCart(item)}
-        className="ml-4 p-2 rounded-full text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors duration-200"
-        aria-label={`Remove ${item.name} from cart`}
+        className="h-8 w-8 rounded text-red-500 hover:bg-red-300 hover:text-red-600 transition-colors duration-200 bg-red-200 items-center justify-center flex cursor-pointer"
+        aria-label={`${item.name} törlése a kosárból`}
       >
         <FontAwesomeIcon icon={faTrashAlt} size="sm" />
       </button>

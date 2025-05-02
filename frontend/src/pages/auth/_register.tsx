@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import logoImage from '../../assets/bufego.png';
+import logoImage from "../../assets/bufego.png";
 import { GeometricBackground } from "../../components/design/GeometricBackground";
 
 export const RegisterPage = () => {
@@ -48,7 +48,7 @@ export const RegisterPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-[var(--primary)] to-[var(--primary-light)] relative overflow-hidden">
       <GeometricBackground />
-      
+
       <div className="absolute top-4 left-4">
         <a href="/" aria-label="Főoldal">
           <img src={logoImage} alt="BüféGO Logo" className="h-10 md:h-12" />
@@ -69,7 +69,7 @@ export const RegisterPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
               required
             />
           </div>
@@ -83,7 +83,7 @@ export const RegisterPage = () => {
               name="username"
               value={formData.username}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
               required
             />
           </div>
@@ -97,7 +97,7 @@ export const RegisterPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
               required
             />
           </div>
@@ -111,7 +111,7 @@ export const RegisterPage = () => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
               required
             />
           </div>

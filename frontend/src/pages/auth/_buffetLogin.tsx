@@ -54,7 +54,7 @@ export const BuffetLoginPage = () => {
 
       <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-4 transition-all duration-300 hover:shadow-2xl z-10">
         <h2 className="text-3xl font-bold text-center text-[var(--primary)] mb-8">
-          Buffet Bejelentkezés
+          Büfé Bejelentkezés
         </h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
@@ -66,7 +66,7 @@ export const BuffetLoginPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
               required
             />
           </div>
@@ -79,7 +79,7 @@ export const BuffetLoginPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
               required
             />
           </div>

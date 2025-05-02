@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Navbar } from "../../components/landing/Navbar";
@@ -19,12 +19,8 @@ export const BuffetDetails = () => {
   const [buffet, setBuffet] = useState<Buffet | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // --- Cart State ---
   const [cart, setCart] = useState<InventoryItem[]>([]);
-  // --- End Cart State ---
 
-  // Order UI state
   const [ordering, setOrdering] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<string | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
@@ -49,19 +45,19 @@ export const BuffetDetails = () => {
              uniqueId: item._id ? item._id.toString() : `${item.name}-${index}`
           })) || [],
           dailyHours: data.dailyHours || {
-            monday: "7:00 AM - 9:00 PM",
-            tuesday: "7:00 AM - 9:00 PM",
-            wednesday: "7:00 AM - 9:00 PM",
-            thursday: "7:00 AM - 9:00 PM",
-            friday: "7:00 AM - 10:00 PM",
-            saturday: "8:00 AM - 10:00 PM",
-            sunday: "8:00 AM - 8:00 PM"
+            monday: "7:00 - 21:00",
+            tuesday: "7:00 - 21:00",
+            wednesday: "7:00 - 21:00",
+            thursday: "7:00 - 21:00",
+            friday: "7:00 - 22:00",
+            saturday: "8:00 - 22:00",
+            sunday: "8:00 - 20:00"
           }
         };
         setBuffet(buffetData);
       } catch (err) {
-        console.error("Error fetching buffet details:", err);
-        setError("Failed to load buffet details. Please try again later.");
+        console.error("Hiba a lekérdezés során:", err);
+        setError("A büfék betöltése sikertelen. Próbáld meg később.");
       } finally {
         setLoading(false);
       }
@@ -70,12 +66,11 @@ export const BuffetDetails = () => {
     if (id) fetchBuffet();
   }, [id]);
 
-  // --- Cart Functions ---
   const addToCart = (itemToAdd: InventoryItem) => {
     if (!cart.some(item => item.uniqueId === itemToAdd.uniqueId)) {
       setCart(prevCart => [...prevCart, itemToAdd]);
     } else {
-        console.log(`${itemToAdd.name} is already in the cart.`);
+        console.log(`${itemToAdd.name} már a kosárban van.`);
     }
   };
 
@@ -87,12 +82,12 @@ export const BuffetDetails = () => {
   const placeOrder = async (pickupTime: string) => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
-      alert("You must be logged in to place an order.");
+      alert("Be kell legyél jelentkezve, hogy rendelést adj le.");
       return;
     }
 
     if (cart.length === 0) {
-      alert("Your cart is empty. Please add items to order.");
+      alert("A kosarad üres. Adj hozzá valamit a rendeléshez.");
       return;
     }
 
@@ -111,11 +106,11 @@ export const BuffetDetails = () => {
       await axios.post("http://localhost:3000/api/orders", orderData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setOrderSuccess(`Order placed successfully! Your pickup code is ${orderData.pickupCode}. Pickup around ${new Date(pickupTime).toLocaleTimeString()}.`);
+      setOrderSuccess(`Rendelés sikeresen leadva! Az átvételi kódod: ${orderData.pickupCode}. Átvételi idő: ${new Date(pickupTime).toLocaleTimeString()}.`);
       setCart([]);
     } catch (error: any) {
-      console.error("Error placing order:", error);
-      setOrderError(`Failed to place order. ${error.response?.data?.message || 'Please try again.'}`);
+      console.error("Hiba a rendelés leadása során:", error);
+      setOrderError(`Sikertelen rendelés. ${error.response?.data?.message || 'Kérlek próbáld meg később.'}`);
     } finally {
       setOrdering(false);
     }
@@ -147,8 +142,8 @@ export const BuffetDetails = () => {
         <Navbar />
         <div className="flex justify-center items-center h-screen">
           <div className="text-lg text-red-600 bg-red-100 p-4 rounded-lg shadow">
-            <p className="font-bold">Error</p>
-            <p>{error || "Buffet not found."}</p>
+            <p className="font-bold">Hiba</p>
+            <p>{error || "Büfé nem található."}</p>
           </div>
         </div>
       </div>
@@ -156,8 +151,8 @@ export const BuffetDetails = () => {
   }
 
   const renderMap = (status: Status) => {
-    if (status === Status.LOADING) return <div>Loading map...</div>;
-    if (status === Status.FAILURE) return <div>Failed to load map.</div>;
+    if (status === Status.LOADING) return <div>Térkép betöltése...</div>;
+    if (status === Status.FAILURE) return <div>Sikertelen a térkép betöltése.</div>;
     return <MapComponent location={buffet.location} />;
   };
 
@@ -187,7 +182,7 @@ export const BuffetDetails = () => {
             icon={faArrowLeft}
             className="mr-2 transition-transform group-hover:-translate-x-1"
           />
-          <span className="font-medium">Explore Other Buffets</span>
+          <span className="font-medium">Fedezz fel más büféket</span>
         </Link>
 
         {/* Buffet Details Card */}
@@ -199,13 +194,13 @@ export const BuffetDetails = () => {
 
           {/* Full width map section */}
           <div className="w-full p-6 md:p-8 border-t border-gray-100">
-             <h3 className="font-semibold text-lg mb-3" style={{ color: "var(--text)" }}>Find Us</h3>
+             <h3 className="font-semibold text-lg mb-3" style={{ color: "var(--text)" }}>Keress minket!</h3>
              <div className="w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-md">
                {apiKey ? (
                  <Wrapper apiKey={apiKey} render={renderMap} />
                ) : (
                  <div className="bg-gray-100 text-red-600 w-full h-full flex items-center justify-center text-center p-4">
-                   Google Maps API key is missing.<br/>Map cannot be displayed.
+                   API hiba lépett fel.<br/>A térkép nem jeleníthető meg.
                  </div>
                )}
              </div>

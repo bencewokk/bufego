@@ -35,7 +35,7 @@ const PickupTimeSelector: React.FC<PickupTimeSelectorProps> = ({
     <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
       <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
         <FontAwesomeIcon icon={faClock} className="text-primary mr-2" />
-        Pickup Time (Today)
+        Átvételi időpont (Ma)
       </label>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 bg-white p-2 rounded-md border border-gray-200">
@@ -43,7 +43,7 @@ const PickupTimeSelector: React.FC<PickupTimeSelectorProps> = ({
             type="number"
             min={new Date().getHours()}
             max={23}
-            className="w-16 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-16 p-2 border border-[#9f9f9f] rounded focus:outline-none focus:ring-0 hover:border-[#4f4f4f] focus:border-[#4f4f4f] transition-all duration-300"
             placeholder="HH"
             value={pickupHour}
             onChange={e => setPickupHour(e.target.value.replace(/[^0-9]/g, "").slice(0, 2))}
@@ -54,7 +54,7 @@ const PickupTimeSelector: React.FC<PickupTimeSelectorProps> = ({
             type="number"
             min={0}
             max={59}
-            className="w-16 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-16 p-2 border border-[#9f9f9f] rounded focus:outline-none focus:ring-0 hover:border-[#4f4f4f] focus:border-[#4f4f4f] transition-all duration-300"
             placeholder="MM"
             value={pickupMinute}
             onChange={e => setPickupMinute(e.target.value.replace(/[^0-9]/g, "").slice(0, 2))}
@@ -72,7 +72,7 @@ const PickupTimeSelector: React.FC<PickupTimeSelectorProps> = ({
           type="button"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="mt-3 w-full px-4 py-2 bg-primary text-white rounded-md font-medium 
+          className="mt-3 w-full px-4 py-2 bg-primary text-white rounded-md font-medium cursor-pointer
                     hover:bg-primary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => setPickupAccepted(true)}
           disabled={!isPickupValid}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import OrderStatusTracker from "../buffets/OrderStatusTracker";
 
 export const Hero = () => {
@@ -109,7 +109,7 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 flex-wrap sm:flex-nowrap">
               <button
                 type="button"
-                className="bg-white text-[var(--primary)] px-6 py-3 rounded-full font-medium text-center hover:bg-gray-100 transition-colors border-2 border-white"
+                className="bg-white text-[var(--primary)] px-6 py-3 rounded-full font-medium text-center hover:bg-gray-100 transition-colors border-2 border-white cursor-pointer"
                 onClick={() => {
                   setShowOrderModal(true);
                   setSubmittedCode("");
@@ -154,7 +154,7 @@ export const Hero = () => {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
             <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl"
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl cursor-pointer transition-all"
               onClick={() => setShowOrderModal(false)}
               aria-label="Close"
             >
@@ -175,7 +175,7 @@ export const Hero = () => {
                 </label>
                 <input
                   type="text"
-                  className="border p-2 rounded w-full mb-4"
+                  className="border p-2 w-full mb-4 border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent hover:border-[var(--primary)] outline-none transition-all"
                   placeholder="Írd be az átvételi kódod..."
                   value={pickupCode}
                   onChange={(e) => setPickupCode(e.target.value)}
@@ -183,7 +183,7 @@ export const Hero = () => {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-[var(--primary)] text-white py-2 rounded font-semibold hover:bg-[var(--primary-dark)] transition"
+                  className="w-full bg-[var(--primary)] text-white py-2 rounded font-semibold hover:bg-[var(--primary-dark)] transition cursor-pointer"
                   disabled={!pickupCode.trim()}
                 >
                   Követés

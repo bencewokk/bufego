@@ -70,7 +70,7 @@ export const BuffetListPage = () => {
             <input
               type="text"
               placeholder="Keresés név vagy étel szerint..."
-              className="w-full p-4 rounded-full border border-gray-300 pl-12"
+              className="pl-12 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

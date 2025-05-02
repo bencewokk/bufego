@@ -40,14 +40,14 @@ const BuffetInfo: React.FC<BuffetInfoProps> = ({ buffet, today, todayHours }) =>
           <div className="flex items-start">
             <FontAwesomeIcon icon={faMapMarkerAlt} style={{ color: "var(--primary)" }} className="mt-1 mr-3 text-lg" />
             <div>
-              <h3 className="font-semibold text-sm mb-0.5" style={{ color: "var(--text)" }}>Location</h3>
+              <h3 className="font-semibold text-sm mb-0.5" style={{ color: "var(--text)" }}>Helyszín</h3>
               <p className="text-gray-700 text-base">{buffet.location}</p>
             </div>
           </div>
           <div className="flex items-start">
             <FontAwesomeIcon icon={faCalendarAlt} style={{ color: "var(--primary)" }} className="mt-1 mr-3 text-lg" />
             <div>
-              <h3 className="font-semibold text-sm mb-1" style={{ color: "var(--text)" }}>Daily Hours</h3>
+              <h3 className="font-semibold text-sm mb-1" style={{ color: "var(--text)" }}>Nyitvatartás</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm">
                 {buffet.dailyHours && Object.entries(buffet.dailyHours).map(([day, hours]) => (
                   <div key={day} className={`flex justify-between ${day === today ? 'font-semibold' : ''}`}>
@@ -62,7 +62,7 @@ const BuffetInfo: React.FC<BuffetInfoProps> = ({ buffet, today, todayHours }) =>
             <div className="flex items-center">
               <FontAwesomeIcon icon={faEnvelope} style={{ color: "var(--primary)" }} className="mr-3 text-lg" />
               <div>
-                <h3 className="font-semibold text-sm mb-0.5" style={{ color: "var(--text)" }}>Contact</h3>
+                <h3 className="font-semibold text-sm mb-0.5" style={{ color: "var(--text)" }}>Elérhetőség</h3>
                 <a href={`mailto:${buffet.email}`} className="link-color text-base hover:underline">
                   {buffet.email}
                 </a>
@@ -75,7 +75,7 @@ const BuffetInfo: React.FC<BuffetInfoProps> = ({ buffet, today, todayHours }) =>
         <div className="mt-5">
           <div className="flex items-center mb-2">
             <FontAwesomeIcon icon={faTag} style={{ color: "var(--primary)" }} className="mr-2 text-base"/>
-            <h3 className="font-semibold text-sm" style={{ color: "var(--text)" }}>Features</h3>
+            <h3 className="font-semibold text-sm" style={{ color: "var(--text)" }}>Lehetőségek</h3>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {buffet.tags.map((tag, index) => (

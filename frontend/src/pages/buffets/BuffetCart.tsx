@@ -185,7 +185,7 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
       }
     } catch {}
 
-    console.log("Payment successful!");
+    console.log("Sikeres fizetés!");
     // Generate pickup code
     const generatedCode = generatePickupCode();
     
@@ -291,7 +291,7 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-semibold">Kosár:</span>
                     <button
-                      className="text-xs text-[var(--primary)] underline ml-2"
+                      className="text-xs text-[var(--primary)] underline ml-2 cursor-pointer"
                       onClick={() => setCartAccepted(false)}
                     >Módosít</button>
                   </div>
@@ -352,11 +352,11 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
                 ))}
               </motion.div>
               <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-100 mt-4">
-                <span className="font-medium text-gray-700">Total</span>
+                <span className="font-medium text-gray-700">Összesen</span>
                 <span className="text-xl font-bold text-primary">{total} Ft</span>
               </div>
               <button
-                className="mt-4 w-full px-4 py-2 bg-[var(--primary)] text-white rounded font-semibold disabled:opacity-50"
+                className="mt-4 w-full px-4 py-2 bg-[var(--primary)] text-white rounded font-semibold disabled:opacity-50 cursor-pointer"
                 onClick={() => setCartAccepted(true)}
                 disabled={cart.length === 0}
               >Elfogadom a kosarat</button>
@@ -375,13 +375,13 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
               <div className="flex gap-2 items-center">
                 <input
                   type="email"
-                  className="border p-2 rounded flex-1 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary-light)] transition"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all hover:border-[var(--primary)]"
                   placeholder="Email address"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
                 <button
-                  className="px-4 py-2 bg-[var(--primary)] text-white rounded disabled:opacity-50 transition"
+                  className="px-4 py-2 bg-[var(--primary)] text-white rounded disabled:opacity-50 transition cursor-pointer"
                   disabled={!isEmailValid}
                   onClick={handleAcceptEmail}
                 >Elfogad</button>
@@ -413,7 +413,7 @@ const BuffetCart: React.FC<BuffetCartProps> = ({
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
               <label className="flex items-center text-sm font-medium text-gray-700 mb-3">
                 <FontAwesomeIcon icon={faCreditCard} className="text-primary mr-2" />
-                Pay securely with card
+                Fizess biztonságosan bankkártyával
               </label>
               {paymentStatus === 'success' && pickupCode ? (
                 <OrderConfirmation
